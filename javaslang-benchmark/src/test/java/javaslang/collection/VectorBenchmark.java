@@ -6,20 +6,18 @@ import org.junit.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import scala.collection.generic.CanBuildFrom;
-import scala.compat.java8.functionConverterImpls.FromJavaFunction;
-import scala.compat.java8.functionConverterImpls.FromJavaPredicate;
 
 import java.util.Objects;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static javaslang.JmhRunner.Includes.*;
 import static javaslang.JmhRunner.*;
 import static javaslang.collection.Collections.areEqual;
 import static scala.collection.JavaConversions.asJavaCollection;
 import static scala.collection.JavaConversions.asScalaBuffer;
-import static scala.compat.java8.JFunction.func;
 
 @SuppressWarnings({ "ALL", "unchecked", "rawtypes" })
 public class VectorBenchmark {
@@ -32,7 +30,10 @@ public class VectorBenchmark {
             Map.class,
             Filter.class,
             Prepend.class,
+            PrependAll.class,
             Append.class,
+            AppendAll.class,
+            Insert.class,
             GroupBy.class,
             Slice.class,
             Iterate.class
@@ -48,7 +49,7 @@ public class VectorBenchmark {
 
     @State(Scope.Benchmark)
     public static class Base {
-        @Param({ "32", "1024", "32768" /*, "1048576", "33554432", "1073741824" */ }) /* i.e. depth 1,2,3(,4,5,6) for a branching factor of 32 */
+        @Param({ "10", "100", "1026" })
         public int CONTAINER_SIZE;
 
         int EXPECTED_AGGREGATE;
@@ -72,7 +73,7 @@ public class VectorBenchmark {
         public void setup() {
             final Random random = new Random(0);
             ELEMENTS = getRandomValues(CONTAINER_SIZE, false, random);
-            INT_ELEMENTS = LeafType.asPrimitives(int.class, Array.of(ELEMENTS));
+            INT_ELEMENTS = ArrayType.asPrimitives(int.class, Array.of(ELEMENTS));
             RANDOMIZED_INDICES = shuffle(Array.range(0, CONTAINER_SIZE).toJavaStream().mapToInt(Integer::intValue).toArray(), random);
 
             EXPECTED_AGGREGATE = Array.of(ELEMENTS).reduce(JmhRunner::aggregate);
@@ -113,7 +114,7 @@ public class VectorBenchmark {
 
         @Benchmark
         public Object java_mutable_boxed_stream() {
-            final java.util.List<Integer> values = java.util.Arrays.stream(INT_ELEMENTS).boxed().collect(Collectors.toList());
+            final java.util.List<Integer> values = java.util.Arrays.stream(INT_ELEMENTS).boxed().collect(toList());
             assert areEqual(values, javaMutable);
             return values;
         }
@@ -231,9 +232,7 @@ public class VectorBenchmark {
             }
 
             @TearDown(Level.Invocation)
-            public void tearDown() {
-                javaMutable.clear();
-            }
+            public void tearDown() { javaMutable.clear(); }
         }
 
         @Benchmark
@@ -402,9 +401,7 @@ public class VectorBenchmark {
             }
 
             @TearDown(Level.Invocation)
-            public void tearDown() {
-                javaMutable.clear();
-            }
+            public void tearDown() { javaMutable.clear(); }
         }
 
         @Benchmark
@@ -491,6 +488,7 @@ public class VectorBenchmark {
     }
 
     public static class Map extends Base {
+        final CanBuildFrom canBuildFrom = scala.collection.immutable.Vector.canBuildFrom();
         private static int mapper(int i) { return i + 1; }
 
         @Benchmark
@@ -505,7 +503,7 @@ public class VectorBenchmark {
 
         @Benchmark
         public Object java_mutable() {
-            final java.util.List<Integer> values = javaMutable.stream().map(Map::mapper).collect(Collectors.toList());
+            final java.util.List<Integer> values = javaMutable.stream().map(Map::mapper).collect(toList());
             assert areEqual(values, Array.of(ELEMENTS).map(Map::mapper));
             return values;
         }
@@ -519,8 +517,7 @@ public class VectorBenchmark {
 
         @Benchmark
         public Object scala_persistent() {
-            final CanBuildFrom canBuildFrom = scala.collection.immutable.Vector.canBuildFrom();
-            final scala.collection.immutable.Vector<Integer> values = (scala.collection.immutable.Vector<Integer>) scalaPersistent.map(new FromJavaFunction<>(Map::mapper), canBuildFrom);
+            final scala.collection.immutable.Vector<Integer> values = (scala.collection.immutable.Vector<Integer>) scalaPersistent.map(Map::mapper, canBuildFrom);
             assert areEqual(asJavaCollection(values), Array.of(ELEMENTS).map(Map::mapper));
             return values;
         }
@@ -545,7 +542,7 @@ public class VectorBenchmark {
 
         @Benchmark
         public Object java_mutable() {
-            final java.util.List<Integer> someValues = javaMutable.stream().filter(Filter::isOdd).collect(Collectors.toList());
+            final java.util.List<Integer> someValues = javaMutable.stream().filter(Filter::isOdd).collect(toList());
             assert areEqual(someValues, Array.of(ELEMENTS).filter(Filter::isOdd));
             return someValues;
         }
@@ -559,7 +556,7 @@ public class VectorBenchmark {
 
         @Benchmark
         public Object scala_persistent() {
-            final scala.collection.immutable.Vector<Integer> someValues = (scala.collection.immutable.Vector<Integer>) scalaPersistent.filter(new FromJavaPredicate<>(Filter::isOdd));
+            final scala.collection.immutable.Vector<Integer> someValues = (scala.collection.immutable.Vector<Integer>) scalaPersistent.filter(Filter::isOdd);
             assert areEqual(asJavaCollection(someValues), Array.of(ELEMENTS).filter(Filter::isOdd));
             return someValues;
         }
@@ -667,6 +664,19 @@ public class VectorBenchmark {
         }
     }
 
+    public static class PrependAll extends Base {
+        @Benchmark
+        public void slang_persistent(Blackhole bh) {
+            for (int i = 0; i < CONTAINER_SIZE; i++) {
+                final java.util.List<Integer> front = javaMutable.subList(0, i);
+                final javaslang.collection.Vector<Integer> back = slangPersistent.slice(i, CONTAINER_SIZE);
+                final javaslang.collection.Vector<Integer> values = back.prependAll(front);
+                assert areEqual(values, javaMutable);
+                bh.consume(values);
+            }
+        }
+    }
+
     /** Add all elements (one-by-one, as we're not testing bulk operations) */
     public static class Append extends Base {
         @Benchmark
@@ -752,21 +762,52 @@ public class VectorBenchmark {
         }
     }
 
+    public static class AppendAll extends Base {
+        final CanBuildFrom canBuildFrom = scala.collection.immutable.Vector.canBuildFrom();
+
+        @Benchmark
+        public void scala_persistent(Blackhole bh) {
+            for (int i = 0; i < CONTAINER_SIZE; i++) {
+                final scala.collection.immutable.Vector<Integer> front = scalaPersistent.slice(0, i);
+                final java.util.List<Integer> back = javaMutable.subList(i, CONTAINER_SIZE);
+                final scala.collection.immutable.Vector<Integer> values = front.$plus$plus(asScalaBuffer(back), (CanBuildFrom<scala.collection.immutable.Vector<Integer>, Integer, scala.collection.immutable.Vector<Integer>>) canBuildFrom);
+                assert areEqual(asJavaCollection(values), javaMutable);
+                bh.consume(values);
+            }
+        }
+
+        @Benchmark
+        public void slang_persistent(Blackhole bh) {
+            for (int i = 0; i < CONTAINER_SIZE; i++) {
+                final javaslang.collection.Vector<Integer> front = slangPersistent.slice(0, i);
+                final java.util.List<Integer> back = javaMutable.subList(i, CONTAINER_SIZE);
+                final javaslang.collection.Vector<Integer> values = front.appendAll(back);
+                assert areEqual(values, javaMutable);
+                bh.consume(values);
+            }
+        }
+    }
+
+    public static class Insert extends Base {
+        @Benchmark
+        public void slang_persistent(Blackhole bh) {
+            for (int i = 0; i < CONTAINER_SIZE; i++) {
+                final Vector<Integer> values = slangPersistent.insert(i, 0);
+                assert values.size() == CONTAINER_SIZE + 1;
+                bh.consume(values);
+            }
+        }
+    }
+
     public static class GroupBy extends Base {
         @Benchmark
-        public Object java_mutable() {
-            return javaMutable.stream().collect(Collectors.groupingBy(Integer::bitCount));
-        }
+        public Object java_mutable() { return javaMutable.stream().collect(groupingBy(Integer::bitCount)); }
 
         @Benchmark
-        public Object scala_persistent() {
-            return scalaPersistent.groupBy(func(Integer::bitCount));
-        }
+        public Object scala_persistent() { return scalaPersistent.groupBy(Integer::bitCount); }
 
         @Benchmark
-        public Object slang_persistent() {
-            return slangPersistent.groupBy(Integer::bitCount);
-        }
+        public Object slang_persistent() { return slangPersistent.groupBy(Integer::bitCount); }
     }
 
     /** Consume the vector one-by-one, from the front and back */
@@ -834,26 +875,10 @@ public class VectorBenchmark {
 
     /** Sequential access for all elements */
     public static class Iterate extends Base {
-        @State(Scope.Thread)
-        public static class Initialized {
-            final java.util.ArrayList<Integer> javaMutable = new java.util.ArrayList<>();
-
-            @Setup(Level.Invocation)
-            public void initializeMutable(Base state) {
-                java.util.Collections.addAll(javaMutable, state.ELEMENTS);
-                assert areEqual(javaMutable, asList(state.ELEMENTS));
-            }
-
-            @TearDown(Level.Invocation)
-            public void tearDown() {
-                javaMutable.clear();
-            }
-        }
-
         @Benchmark
-        public int java_mutable(Initialized state) {
+        public int java_mutable() {
             int aggregate = 0;
-            for (final java.util.Iterator<Integer> iterator = state.javaMutable.iterator(); iterator.hasNext(); ) {
+            for (final java.util.Iterator<Integer> iterator = javaMutable.iterator(); iterator.hasNext(); ) {
                 aggregate ^= iterator.next();
             }
             assert aggregate == EXPECTED_AGGREGATE;

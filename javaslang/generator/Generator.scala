@@ -11,6 +11,7 @@ import JavaGenerator._
 import scala.language.implicitConversions
 
 val N = 8
+val VARARGS = 10
 val TARGET_MAIN = "javaslang/src-gen/main/java"
 val TARGET_TEST = "javaslang/src-gen/test/java"
 val CHARSET = java.nio.charset.StandardCharsets.UTF_8
@@ -34,6 +35,7 @@ def generateMainClasses(): Unit = {
   genAPI()
   genFunctions()
   genTuples()
+  genArrayTypes()
 
   /**
    * Generator of Match
@@ -272,19 +274,6 @@ def generateMainClasses(): Unit = {
           }
 
           /$javadoc
-           * Alias for {@link $mapType#of(Object, Object)}
-           *
-           * @param <K>   The key type.
-           * @param <V>   The value type.
-           * @param key   A singleton map key.
-           * @param value A singleton map value.
-           * @return A new {@link $mapType} instance containing the given entry
-           */
-          public static <K, V> $mapType<K, V> $name(K key, V value) {
-              return $mapType.of(key, value);
-          }
-
-          /$javadoc
            * Alias for {@link $mapType#ofEntries(Tuple2...)}
            *
            * @param <K>     The key type.
@@ -310,17 +299,21 @@ def generateMainClasses(): Unit = {
               return $mapType.ofAll(map);
           }
 
-          /$javadoc
-           * Alias for {@link $mapType#of(Object...)}
-           *
-           * @param <K>   The key type.
-           * @param <V>   The value type.
-           * @param pairs A list of key-value pairs.
-           * @return A new {@link $mapType} instance containing the given entries
-           */
-          public static <K, V> $mapType<K, V> $name(Object... pairs) {
-              return $mapType.of(pairs);
-          }
+          ${(1 to VARARGS).gen(i => {
+            xs"""
+              /$javadoc
+               * Alias for {@link $mapType#of(${(1 to i).gen(j => "Object, Object")(", ")})}
+               *
+               * @param <K> The key type.
+               * @param <V> The value type.
+               ${(1 to i).gen(j => s"* @param k$j  The key${ if (i > 1) s" of the ${j.ordinal} pair" else ""}\n* @param v$j  The value${ if (i > 1) s" of the ${j.ordinal} pair" else ""}\n")}
+               * @return A new {@link $mapType} instance containing the given entries
+               */
+              public static <K, V> $mapType<K, V> $name(${(1 to i).gen(j => xs"K k$j, V v$j")(", ")}) {
+                  return $mapType.of(${(1 to i).gen(j => xs"k$j, v$j")(", ")});
+              }
+            """
+          })("\n\n")}
         """
       }
 
@@ -699,19 +692,6 @@ def generateMainClasses(): Unit = {
           }
 
           /$javadoc
-           * Alias for {@link $TreeMapType#of(Comparable, Object)}
-           *
-           * @param <K>   The key type.
-           * @param <V>   The value type.
-           * @param key   A singleton map key.
-           * @param value A singleton map value.
-           * @return A new {@link $TreeMapType} instance containing the given entry
-           */
-          public static <K extends Comparable<? super K>, V> $TreeMapType<K, V> SortedMap(K key, V value) {
-              return $TreeMapType.of(key, value);
-          }
-
-          /$javadoc
            * Alias for {@link $TreeMapType#of(Comparator, Object, Object)}
            *
            * @param <K>           The key type.
@@ -766,17 +746,21 @@ def generateMainClasses(): Unit = {
               return $TreeMapType.ofAll(map);
           }
 
-          /$javadoc
-           * Alias for {@link $TreeMapType#of(Object...)}
-           *
-           * @param <K>   The key type.
-           * @param <V>   The value type.
-           * @param pairs A list of key-value pairs.
-           * @return A new {@link $TreeMapType} instance containing the given entries
-           */
-          public static <K extends Comparable<? super K>, V> $TreeMapType<K, V> SortedMap(Object... pairs) {
-              return $TreeMapType.of(pairs);
-          }
+          ${(1 to VARARGS).gen(i => {
+            xs"""
+              /$javadoc
+               * Alias for {@link $TreeMapType#of(${(1 to i).gen(j => "Object, Object")(", ")})}
+               *
+               * @param <K> The key type.
+               * @param <V> The value type.
+               ${(1 to i).gen(j => s"* @param k$j  The key${if (i > 1) s" of the ${j.ordinal} pair" else ""}\n* @param v$j  The value${if (i > 1) s" of the ${j.ordinal} pair" else ""}\n")}
+               * @return A new {@link $TreeMapType} instance containing the given entries
+               */
+              public static <K extends Comparable<? super K>, V> $TreeMapType<K, V> SortedMap(${(1 to i).gen(j => xs"K k$j, V v$j")(", ")}) {
+                  return $TreeMapType.of(${(1 to i).gen(j => xs"k$j, v$j")(", ")});
+              }
+            """
+          })("\n\n")}
         """
       }
 
@@ -1056,6 +1040,55 @@ def generateMainClasses(): Unit = {
 
           /**
            * Guard pattern, checks if a predicate is satisfied.
+           * <p>
+           * This method is intended to be used with lambdas and method references, for example:
+           *
+           * <pre><code>
+           * String evenOrOdd(int num) {
+           *     return Match(num).of(
+           *             Case($$(i -&gt; i % 2 == 0), "even"),
+           *             Case($$(this::isOdd), "odd")
+           *     );
+           * }
+           *
+           * boolean isOdd(int i) {
+           *     return i % 2 == 1;
+           * }
+           * </code></pre>
+           *
+           * It is also valid to pass {@code Predicate} instances:
+           *
+           * <pre><code>
+           * Predicate&lt;Integer&gt; isOdd = i -&gt; i % 2 == 1;
+           *
+           * Match(num).of(
+           *         Case($$(i -&gt; i % 2 == 0), "even"),
+           *         Case($$(isOdd), "odd")
+           * );
+           * </code></pre>
+           *
+           * <strong>Note:</strong> Please take care when matching {@code Predicate} instances. In general,
+           * <a href="http://cstheory.stackexchange.com/a/14152" target="_blank">function equality</a>
+           * is an undecidable problem in computer science. In Javaslang we are only able to check,
+           * if two functions are the same instance.
+           * <p>
+           * However, this code will fail:
+           *
+           * <pre><code>
+           * Predicate&lt;Integer&gt; p = i -&gt; true;
+           * Match(p).of(
+           *     Case($$(p), 1) // WRONG! It calls $$(Predicate)
+           * );
+           * </code></pre>
+           *
+           * Instead we have to use {@link Predicates#is(Object)}:
+           *
+           * <pre><code>
+           * Predicate&lt;Integer&gt; p = i -&gt; true;
+           * Match(p).of(
+           *     Case(is(p), 1) // CORRECT! It calls $$(T)
+           * );
+           * </code></pre>
            *
            * @param <T>       type of the prototype
            * @param predicate the predicate that tests a given value
@@ -2228,6 +2261,217 @@ def generateMainClasses(): Unit = {
       """
     }
   }
+
+  /**
+    * Generator of javaslang.collection.*ArrayType
+    */
+  def genArrayTypes(): Unit = {
+
+    val types = Map(
+      "Object" -> "Object",
+      "boolean" -> "Boolean",
+      "byte" -> "Byte",
+      "char" -> "Character",
+      "double" -> "Double",
+      "float" -> "Float",
+      "int" -> "Integer",
+      "long" -> "Long",
+      "short" -> "Short"
+    ) // note: there is no void[] in Java
+
+    genJavaslangFile("javaslang.collection", "ArrayType")((im: ImportManager, packageName: String, className: String) => xs"""
+      /**
+       * Helper to replace reflective array access.
+       *
+       * @author Pap Lőrinc
+       * @since 2.1.0
+       */
+      interface ArrayType<T> {
+
+          @SuppressWarnings("unchecked")
+          static <T> ArrayType<T> obj() { return (ArrayType<T>) ObjectArrayType.INSTANCE; }
+
+          Class<T> type();
+          int lengthOf(Object array);
+          T getAt(Object array, int index);
+
+          Object empty();
+          void setAt(Object array, int index, Object value);
+          Object copy(Object array, int arraySize, int sourceFrom, int destinationFrom, int size);
+
+          @SuppressWarnings("unchecked")
+          static <T> ArrayType<T> of(Object array) { return of((Class<T>) array.getClass().getComponentType()); }
+          @SuppressWarnings("unchecked")
+          static <T> ArrayType<T> of(Class<T> type) {
+              if (!type.isPrimitive()) {
+                  return (ArrayType<T>) obj();
+              } else if (boolean.class == type) {
+                  return (ArrayType<T>) BooleanArrayType.INSTANCE;
+              } else if (byte.class == type) {
+                  return (ArrayType<T>) ByteArrayType.INSTANCE;
+              } else if (char.class == type) {
+                  return (ArrayType<T>) CharArrayType.INSTANCE;
+              } else if (double.class == type) {
+                  return (ArrayType<T>) DoubleArrayType.INSTANCE;
+              } else if (float.class == type) {
+                  return (ArrayType<T>) FloatArrayType.INSTANCE;
+              } else if (int.class == type) {
+                  return (ArrayType<T>) IntArrayType.INSTANCE;
+              } else if (long.class == type) {
+                  return (ArrayType<T>) LongArrayType.INSTANCE;
+              } else if (short.class == type) {
+                  return (ArrayType<T>) ShortArrayType.INSTANCE;
+              } else {
+                  throw new IllegalArgumentException("Unknown type: " + type);
+              }
+          }
+
+          default Object newInstance(int length) { return copy(empty(), length); }
+
+          /** System.arrayCopy with same source and destination */
+          default Object copyRange(Object array, int from, int to) {
+              final int length = to - from;
+              return copy(array, length, from, 0, length);
+          }
+
+          /** Repeatedly group an array into equal sized sub-trees */
+          default Object grouped(Object array, int groupSize) {
+              final int arrayLength = lengthOf(array);
+              assert arrayLength > groupSize;
+              final Object results = obj().newInstance(1 + ((arrayLength - 1) / groupSize));
+              obj().setAt(results, 0, copyRange(array, 0, groupSize));
+
+              for (int start = groupSize, i = 1; start < arrayLength; i++) {
+                  final int nextLength = Math.min(groupSize, arrayLength - (i * groupSize));
+                  obj().setAt(results, i, copyRange(array, start, start + nextLength));
+                  start += nextLength;
+              }
+
+              return results;
+          }
+
+          /** clone the source and set the value at the given position */
+          default Object copyUpdate(Object array, int index, T element) {
+              final Object copy = copy(array, index + 1);
+              setAt(copy, index, element);
+              return copy;
+          }
+
+          default Object copy(Object array, int minLength) {
+              final int arrayLength = lengthOf(array);
+              final int length = Math.max(arrayLength, minLength);
+              return copy(array, length, 0, 0, arrayLength);
+          }
+
+          /** clone the source and keep everything after the index (pre-padding the values with null) */
+          default Object copyDrop(Object array, int index) {
+              final int length = lengthOf(array);
+              return copy(array, length, index, index, length - index);
+          }
+
+          /** clone the source and keep everything before and including the index */
+          default Object copyTake(Object array, int lastIndex) {
+              return copyRange(array, 0, lastIndex + 1);
+          }
+
+          /** Create a single element array */
+          default Object asArray(T element) {
+              final Object result = newInstance(1);
+              setAt(result, 0, element);
+              return result;
+          }
+
+          /** Store the content of an iterable in an array */
+          static Object[] asArray(java.util.Iterator<?> it, int length) {
+              final Object[] array = new Object[length];
+              for (int i = 0; i < length; i++) {
+                  array[i] = it.next();
+              }
+              return array;
+          }
+
+          @SuppressWarnings("unchecked")
+          static <T> T asPrimitives(Class<?> primitiveClass, Iterable<?> values) {
+              final Object[] array = Array.ofAll(values).toJavaArray();
+              assert (array.length == 0) || (primitiveClass == primitiveType(array[0])) && !primitiveClass.isArray();
+              final ArrayType<T> type = of((Class<T>) primitiveClass);
+              final Object results = type.newInstance(array.length);
+              for (int i = 0; i < array.length; i++) {
+                  type.setAt(results, i, array[i]);
+              }
+              return (T) results;
+          }
+
+          static <T> Class<?> primitiveType(T element) {
+              final Class<?> wrapper = (element == null) ? Object.class : element.getClass();
+              if (wrapper == Boolean.class) {
+                  return boolean.class;
+              } else if (wrapper == Byte.class) {
+                  return byte.class;
+              } else if (wrapper == Character.class) {
+                  return char.class;
+              } else if (wrapper == Double.class) {
+                  return double.class;
+              } else if (wrapper == Float.class) {
+                  return float.class;
+              } else if (wrapper == Integer.class) {
+                  return int.class;
+              } else if (wrapper == Long.class) {
+                  return long.class;
+              } else if (wrapper == Short.class) {
+                  return short.class;
+              } else {
+                  return wrapper;
+              }
+          }
+
+          ${types.keys.toSeq.sorted.gen(arrayType =>
+            genArrayType(arrayType)(im, packageName, arrayType.capitalize + className)
+          )("\n\n")}
+      }
+    """)
+
+    def genArrayType(arrayType: String)(im: ImportManager, packageName: String, className: String): String = {
+      val wrapperType = types(arrayType)
+      val cast = if (wrapperType != "Object") s" ($wrapperType)" else ""
+
+      xs"""
+        final class $className implements ArrayType<$wrapperType>, ${im.getType("java.io.Serializable")} {
+            private static final long serialVersionUID = 1L;
+            static final $className INSTANCE = new $className();
+            static final $arrayType[] EMPTY = new $arrayType[0];
+
+            private static $arrayType[] cast(Object array) { return ($arrayType[]) array; }
+
+            @Override
+            public Class<$wrapperType> type() { return $arrayType.class; }
+
+            @Override
+            public $arrayType[] empty() { return EMPTY; }
+
+            @Override
+            public int lengthOf(Object array) { return (array == null) ? 0 : cast(array).length; }
+
+            @Override
+            public $wrapperType getAt(Object array, int index) { return cast(array)[index]; }
+
+            @Override
+            public void setAt(Object array, int index, Object value) { cast(array)[index] =$cast value; }
+
+            @Override
+            public Object copy(Object array, int arraySize, int sourceFrom, int destinationFrom, int size) {
+                if (size == 0) {
+                    return new $arrayType[arraySize];
+                } else {
+                    final $arrayType[] result = new $arrayType[arraySize];
+                    System.arraycopy(array, sourceFrom, result, destinationFrom, size); /* has to be near the object allocation to avoid zeroing out the array */
+                    return result;
+                }
+            }
+        }
+      """
+    }
+  }
 }
 
 /**
@@ -2252,6 +2496,7 @@ def generateTestClasses(): Unit = {
       val API = im.getType("javaslang.API")
       val AssertionsExtensions = im.getType("javaslang.AssertionsExtensions")
       val ListType = im.getType("javaslang.collection.List")
+      val MapType = im.getType("javaslang.collection.Map")
       val OptionType = im.getType("javaslang.control.Option")
       val FutureType = im.getType("javaslang.concurrent.Future")
       val ExecutorServiceType = im.getType("java.util.concurrent.Executors")
@@ -2348,6 +2593,16 @@ def generateTestClasses(): Unit = {
           ${genMediumAliasTest(s"${func}FromMap", func, s"$JavaCollectionsType.singletonMap(1, '1')")}
 
           ${genMediumAliasTest(s"${func}FromPairs", func, "1, '1', 2, '2', 3, '3'")}
+
+          ${(1 to VARARGS).gen(i => {
+            xs"""
+              @$test
+              public void shouldCreate${func}From${i}Pairs() {
+                ${MapType}<Integer, Integer> map = ${func}(${(1 to i).gen(j => s"$j, ${j*2}")(", ")});
+                ${(1 to i).gen(j => s"assertThat(map.apply($j)).isEqualTo(${j*2});")("\n")}
+              }
+            """
+          })("\n\n")}
 
         """
       }
@@ -3378,7 +3633,7 @@ object Generator {
   }
 
   /**
-   * Generates a String based on a sequence of objects. Objects are converted to Strings via toString.
+   * Generates a String based on an Iterable of objects. Objects are converted to Strings via toString.
    * {{{
    * // val a = "A"
    * // val b = "B"
@@ -3386,11 +3641,11 @@ object Generator {
    * Seq("a", "b", "c").gen(s => raw"""val $s = "${s.toUpperCase}"""")("\n")
    * }}}
     *
-    * @param seq A Seq
+    * @param iterable An Interable
    */
-  implicit class SeqExtensions(seq: Seq[Any]) {
+  implicit class IterableExtensions(iterable: Iterable[Any]) {
     def gen(f: String => String = identity)(implicit delimiter: String = ""): String =
-      seq.map(x => f.apply(x.toString)) mkString delimiter
+      iterable.map(x => f.apply(x.toString)) mkString delimiter
   }
 
   implicit class Tuple1Extensions(tuple: Tuple1[Any]) {

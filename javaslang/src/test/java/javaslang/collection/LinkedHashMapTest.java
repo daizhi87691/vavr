@@ -48,13 +48,18 @@ public class LinkedHashMapTest extends AbstractMapTest {
     }
 
     @Override
-    protected <K extends Comparable<? super K>, V> LinkedHashMap<K, V> mapOfPairs(Object... pairs) {
-        return LinkedHashMap.of(pairs);
+    protected <K extends Comparable<? super K>, V> LinkedHashMap<K, V> mapOf(K key, V value) {
+        return LinkedHashMap.of(key, value);
     }
 
     @Override
-    protected <K extends Comparable<? super K>, V> LinkedHashMap<K, V> mapOf(K key, V value) {
-        return LinkedHashMap.of(key, value);
+    protected <K extends Comparable<? super K>, V> Map<K, V> mapOf(K k1, V v1, K k2, V v2) {
+        return LinkedHashMap.of(k1, v1, k2, v2);
+    }
+
+    @Override
+    protected <K extends Comparable<? super K>, V> Map<K, V> mapOf(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3);
     }
 
     @Override
@@ -69,8 +74,14 @@ public class LinkedHashMapTest extends AbstractMapTest {
 
     @Test
     public void shouldKeepOrder() {
-        CharSeq actual = LinkedHashMap.<Integer, Character> empty().put(3, 'a').put(2, 'b').put(1, 'c').foldLeft(CharSeq.empty(), (s, t) -> s.append(t._2));
-        assertThat(actual).isEqualTo(CharSeq.of("abc"));
+        List<Character> actual = LinkedHashMap.<Integer, Character> empty().put(3, 'a').put(2, 'b').put(1, 'c').foldLeft(List.empty(), (s, t) -> s.append(t._2));
+        Assertions.assertThat(actual).isEqualTo(List.of('a', 'b', 'c'));
+    }
+
+    @Test
+    public void shouldKeepValuesOrder() {
+        List<Character> actual = LinkedHashMap.<Integer, Character> empty().put(3, 'a').put(2, 'b').put(1, 'c').values().foldLeft(List.empty(), List::append);
+        Assertions.assertThat(actual).isEqualTo(List.of('a', 'b', 'c'));
     }
 
     // -- static narrow

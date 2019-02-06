@@ -10,9 +10,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static javaslang.Function1.identity;
-import static javaslang.collection.LeafType.asPrimitive;
-import static javaslang.collection.LeafType.obj;
+import static java.util.function.Function.identity;
+import static javaslang.collection.ArrayType.obj;
+import static javaslang.collection.ArrayType.primitiveType;
 import static javaslang.collection.NodeModifier.*;
 
 /**
@@ -43,12 +43,12 @@ final class BitMappedTrie<T> implements Serializable {
     @SuppressWarnings("unchecked")
     static <T> BitMappedTrie<T> empty() { return (BitMappedTrie<T>) EMPTY; }
 
-    final LeafType<T> type;
+    final ArrayType<T> type;
     private final Object array;
     private final int offset, length;
     private final int depthShift;
 
-    private BitMappedTrie(LeafType<T> type, Object array, int offset, int length, int depthShift) {
+    private BitMappedTrie(ArrayType<T> type, Object array, int offset, int length, int depthShift) {
         this.type = type;
         this.array = array;
         this.offset = offset;
@@ -56,7 +56,7 @@ final class BitMappedTrie<T> implements Serializable {
         this.depthShift = depthShift;
 
         assert length <= treeSize(BRANCHING_FACTOR, depthShift);
-        assert (EMPTY == null) || ((length > 0) && (LeafType.of(array).lengthOf(array) > 0));
+        assert (EMPTY == null) || ((length > 0) && (ArrayType.of(array).lengthOf(array) > 0));
     }
 
     private static int treeSize(int branchCount, int depthShift) {
@@ -65,13 +65,13 @@ final class BitMappedTrie<T> implements Serializable {
     }
 
     static <T> BitMappedTrie<T> ofAll(Object array) {
-        final LeafType<T> type = LeafType.of(array);
+        final ArrayType<T> type = ArrayType.of(array);
         final int size = type.lengthOf(array);
         if (size == 0) {
             return empty();
         } else {
             int shift = 0;
-            for (LeafType<T> t = type; t.lengthOf(array) > BRANCHING_FACTOR; shift += BRANCHING_BASE) {
+            for (ArrayType<T> t = type; t.lengthOf(array) > BRANCHING_FACTOR; shift += BRANCHING_BASE) {
                 array = t.grouped(array, BRANCHING_FACTOR);
                 t = obj();
             }
@@ -79,9 +79,11 @@ final class BitMappedTrie<T> implements Serializable {
         }
     }
 
+    private BitMappedTrie<T> boxed() { return map(identity()); }
+
     BitMappedTrie<T> prepend(T leading) {
         if (cannotAdd(leading)) {
-            return map(identity()).prepend(leading);
+            return boxed().prepend(leading);
         } else {
             final int newSize = length() + 1;
             if (length() == 0) {
@@ -105,7 +107,7 @@ final class BitMappedTrie<T> implements Serializable {
 
     BitMappedTrie<T> append(T trailing) {
         if (cannotAdd(trailing)) {
-            return map(identity()).append(trailing);
+            return boxed().append(trailing);
         } else {
             final int newSize = length() + 1;
             if (length() == 0) {
@@ -127,7 +129,7 @@ final class BitMappedTrie<T> implements Serializable {
 
     BitMappedTrie<T> update(int index, T element) {
         if (cannotAdd(element)) {
-            return map(identity()).update(index, element);
+            return boxed().update(index, element);
         } else {
             final Object root = modifyLeaf(array, depthShift, offset + index, COPY_NODE, updateLeafWith(type, element));
             return new BitMappedTrie<>(type, root, offset, length(), depthShift);
@@ -169,7 +171,7 @@ final class BitMappedTrie<T> implements Serializable {
     }
 
     /* drop root node while it has a single element */
-    private static <T> BitMappedTrie<T> collapsed(LeafType<T> type, Object array, int offset, int length, int shift) {
+    private static <T> BitMappedTrie<T> collapsed(ArrayType<T> type, Object array, int offset, int length, int shift) {
         for (; shift > 0; shift -= BRANCHING_BASE) {
             final int skippedElements = obj().lengthOf(array) - 1;
             if (skippedElements != digit(offset, shift)) {
@@ -314,14 +316,14 @@ final class BitMappedTrie<T> implements Serializable {
     }
 
     int length()                         { return length; }
-    private boolean cannotAdd(T element) { return type.isPrimitive() && ((element == null) || (type.type() != asPrimitive(element.getClass()))); }
+    private boolean cannotAdd(T element) { return (type != obj()) && (type.type() != primitiveType(element)); }
 }
 
 @FunctionalInterface
 interface NodeModifier {
     Object apply(Object array, int index);
 
-    static <T> NodeModifier updateLeafWith(LeafType<T> type, T element) { return (a, i) -> type.copyUpdate(a, i, element); }
+    static <T> NodeModifier updateLeafWith(ArrayType<T> type, T element) { return (a, i) -> type.copyUpdate(a, i, element); }
     NodeModifier COPY_NODE = (o, i) -> obj().copy(o, i + 1);
     NodeModifier IDENTITY = (o, i) -> o;
 }

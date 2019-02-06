@@ -1771,19 +1771,6 @@ public final class API {
     }
 
     /**
-     * Alias for {@link LinkedHashMap#of(Object, Object)}
-     *
-     * @param <K>   The key type.
-     * @param <V>   The value type.
-     * @param key   A singleton map key.
-     * @param value A singleton map value.
-     * @return A new {@link LinkedHashMap} instance containing the given entry
-     */
-    public static <K, V> LinkedHashMap<K, V> LinkedMap(K key, V value) {
-        return LinkedHashMap.of(key, value);
-    }
-
-    /**
      * Alias for {@link LinkedHashMap#ofEntries(Tuple2...)}
      *
      * @param <K>     The key type.
@@ -1810,15 +1797,223 @@ public final class API {
     }
 
     /**
-     * Alias for {@link LinkedHashMap#of(Object...)}
+     * Alias for {@link LinkedHashMap#of(Object, Object)}
      *
-     * @param <K>   The key type.
-     * @param <V>   The value type.
-     * @param pairs A list of key-value pairs.
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key
+     * @param v1  The value
      * @return A new {@link LinkedHashMap} instance containing the given entries
      */
-    public static <K, V> LinkedHashMap<K, V> LinkedMap(Object... pairs) {
-        return LinkedHashMap.of(pairs);
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1) {
+        return LinkedHashMap.of(k1, v1);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2) {
+        return LinkedHashMap.of(k1, v1, k2, v2);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @param k9  The key of the 9th pair
+     * @param v9  The value of the 9th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
+    }
+
+    /**
+     * Alias for {@link LinkedHashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @param k9  The key of the 9th pair
+     * @param v9  The value of the 9th pair
+     * @param k10  The key of the 10th pair
+     * @param v10  The value of the 10th pair
+     * @return A new {@link LinkedHashMap} instance containing the given entries
+     */
+    public static <K, V> LinkedHashMap<K, V> LinkedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
+        return LinkedHashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
     }
 
     /**
@@ -1830,19 +2025,6 @@ public final class API {
      */
     public static <K, V> HashMap<K, V> Map() {
         return HashMap.empty();
-    }
-
-    /**
-     * Alias for {@link HashMap#of(Object, Object)}
-     *
-     * @param <K>   The key type.
-     * @param <V>   The value type.
-     * @param key   A singleton map key.
-     * @param value A singleton map value.
-     * @return A new {@link HashMap} instance containing the given entry
-     */
-    public static <K, V> HashMap<K, V> Map(K key, V value) {
-        return HashMap.of(key, value);
     }
 
     /**
@@ -1872,15 +2054,223 @@ public final class API {
     }
 
     /**
-     * Alias for {@link HashMap#of(Object...)}
+     * Alias for {@link HashMap#of(Object, Object)}
      *
-     * @param <K>   The key type.
-     * @param <V>   The value type.
-     * @param pairs A list of key-value pairs.
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key
+     * @param v1  The value
      * @return A new {@link HashMap} instance containing the given entries
      */
-    public static <K, V> HashMap<K, V> Map(Object... pairs) {
-        return HashMap.of(pairs);
+    public static <K, V> HashMap<K, V> Map(K k1, V v1) {
+        return HashMap.of(k1, v1);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2) {
+        return HashMap.of(k1, v1, k2, v2);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @param k9  The key of the 9th pair
+     * @param v9  The value of the 9th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
+    }
+
+    /**
+     * Alias for {@link HashMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @param k9  The key of the 9th pair
+     * @param v9  The value of the 9th pair
+     * @param k10  The key of the 10th pair
+     * @param v10  The value of the 10th pair
+     * @return A new {@link HashMap} instance containing the given entries
+     */
+    public static <K, V> HashMap<K, V> Map(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
+        return HashMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
     }
 
     /**
@@ -1904,19 +2294,6 @@ public final class API {
      */
     public static <K, V> TreeMap<K, V> SortedMap(Comparator<? super K> keyComparator) {
         return TreeMap.empty(keyComparator);
-    }
-
-    /**
-     * Alias for {@link TreeMap#of(Comparable, Object)}
-     *
-     * @param <K>   The key type.
-     * @param <V>   The value type.
-     * @param key   A singleton map key.
-     * @param value A singleton map value.
-     * @return A new {@link TreeMap} instance containing the given entry
-     */
-    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K key, V value) {
-        return TreeMap.of(key, value);
     }
 
     /**
@@ -1975,15 +2352,223 @@ public final class API {
     }
 
     /**
-     * Alias for {@link TreeMap#of(Object...)}
+     * Alias for {@link TreeMap#of(Object, Object)}
      *
-     * @param <K>   The key type.
-     * @param <V>   The value type.
-     * @param pairs A list of key-value pairs.
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key
+     * @param v1  The value
      * @return A new {@link TreeMap} instance containing the given entries
      */
-    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(Object... pairs) {
-        return TreeMap.of(pairs);
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1) {
+        return TreeMap.of(k1, v1);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2) {
+        return TreeMap.of(k1, v1, k2, v2);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @param k9  The key of the 9th pair
+     * @param v9  The value of the 9th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
+    }
+
+    /**
+     * Alias for {@link TreeMap#of(Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object)}
+     *
+     * @param <K> The key type.
+     * @param <V> The value type.
+     * @param k1  The key of the 1st pair
+     * @param v1  The value of the 1st pair
+     * @param k2  The key of the 2nd pair
+     * @param v2  The value of the 2nd pair
+     * @param k3  The key of the 3rd pair
+     * @param v3  The value of the 3rd pair
+     * @param k4  The key of the 4th pair
+     * @param v4  The value of the 4th pair
+     * @param k5  The key of the 5th pair
+     * @param v5  The value of the 5th pair
+     * @param k6  The key of the 6th pair
+     * @param v6  The value of the 6th pair
+     * @param k7  The key of the 7th pair
+     * @param v7  The value of the 7th pair
+     * @param k8  The key of the 8th pair
+     * @param v8  The value of the 8th pair
+     * @param k9  The key of the 9th pair
+     * @param v9  The value of the 9th pair
+     * @param k10  The key of the 10th pair
+     * @param v10  The value of the 10th pair
+     * @return A new {@link TreeMap} instance containing the given entries
+     */
+    public static <K extends Comparable<? super K>, V> TreeMap<K, V> SortedMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5, K k6, V v6, K k7, V v7, K k8, V v8, K k9, V v9, K k10, V v10) {
+        return TreeMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
     }
 
     //
@@ -2802,6 +3387,55 @@ public final class API {
 
     /**
      * Guard pattern, checks if a predicate is satisfied.
+     * <p>
+     * This method is intended to be used with lambdas and method references, for example:
+     *
+     * <pre><code>
+     * String evenOrOdd(int num) {
+     *     return Match(num).of(
+     *             Case($(i -&gt; i % 2 == 0), "even"),
+     *             Case($(this::isOdd), "odd")
+     *     );
+     * }
+     *
+     * boolean isOdd(int i) {
+     *     return i % 2 == 1;
+     * }
+     * </code></pre>
+     *
+     * It is also valid to pass {@code Predicate} instances:
+     *
+     * <pre><code>
+     * Predicate&lt;Integer&gt; isOdd = i -&gt; i % 2 == 1;
+     *
+     * Match(num).of(
+     *         Case($(i -&gt; i % 2 == 0), "even"),
+     *         Case($(isOdd), "odd")
+     * );
+     * </code></pre>
+     *
+     * <strong>Note:</strong> Please take care when matching {@code Predicate} instances. In general,
+     * <a href="http://cstheory.stackexchange.com/a/14152" target="_blank">function equality</a>
+     * is an undecidable problem in computer science. In Javaslang we are only able to check,
+     * if two functions are the same instance.
+     * <p>
+     * However, this code will fail:
+     *
+     * <pre><code>
+     * Predicate&lt;Integer&gt; p = i -&gt; true;
+     * Match(p).of(
+     *     Case($(p), 1) // WRONG! It calls $(Predicate)
+     * );
+     * </code></pre>
+     *
+     * Instead we have to use {@link Predicates#is(Object)}:
+     *
+     * <pre><code>
+     * Predicate&lt;Integer&gt; p = i -&gt; true;
+     * Match(p).of(
+     *     Case(is(p), 1) // CORRECT! It calls $(T)
+     * );
+     * </code></pre>
      *
      * @param <T>       type of the prototype
      * @param predicate the predicate that tests a given value

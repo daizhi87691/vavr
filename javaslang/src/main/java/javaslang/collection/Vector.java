@@ -14,9 +14,10 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collector;
 
+import static javaslang.collection.ArrayType.asArray;
 import static javaslang.collection.Collections.areEqual;
 import static javaslang.collection.Collections.seq;
-import static javaslang.collection.LeafType.asArray;
+import static javaslang.collection.ArrayType.asArray;
 
 /**
  * Vector is the default Seq implementation that provides effectively constant time access to any element.
@@ -272,16 +273,16 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
     }
 
     public static Vector<Character> range(char from, char toExclusive) {
-        return ofAll(LeafType.<char[]> asPrimitives(char.class, Iterator.range(from, toExclusive)));
+        return ofAll(ArrayType.<char[]> asPrimitives(char.class, Iterator.range(from, toExclusive)));
     }
 
     public static Vector<Character> rangeBy(char from, char toExclusive, int step) {
-        return ofAll(LeafType.<char[]> asPrimitives(char.class, Iterator.rangeBy(from, toExclusive, step)));
+        return ofAll(ArrayType.<char[]> asPrimitives(char.class, Iterator.rangeBy(from, toExclusive, step)));
     }
 
     @GwtIncompatible
     public static Vector<Double> rangeBy(double from, double toExclusive, double step) {
-        return ofAll(LeafType.<double[]> asPrimitives(double.class, Iterator.rangeBy(from, toExclusive, step)));
+        return ofAll(ArrayType.<double[]> asPrimitives(double.class, Iterator.rangeBy(from, toExclusive, step)));
     }
 
     /**
@@ -301,7 +302,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @return a range of int values as specified or the empty range if {@code from >= toExclusive}
      */
     public static Vector<Integer> range(int from, int toExclusive) {
-        return ofAll(LeafType.<int[]> asPrimitives(int.class, Iterator.range(from, toExclusive)));
+        return ofAll(ArrayType.<int[]> asPrimitives(int.class, Iterator.range(from, toExclusive)));
     }
 
     /**
@@ -327,7 +328,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @throws IllegalArgumentException if {@code step} is zero
      */
     public static Vector<Integer> rangeBy(int from, int toExclusive, int step) {
-        return ofAll(LeafType.<int[]> asPrimitives(int.class, Iterator.rangeBy(from, toExclusive, step)));
+        return ofAll(ArrayType.<int[]> asPrimitives(int.class, Iterator.rangeBy(from, toExclusive, step)));
     }
 
     /**
@@ -347,7 +348,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @return a range of long values as specified or the empty range if {@code from >= toExclusive}
      */
     public static Vector<Long> range(long from, long toExclusive) {
-        return ofAll(LeafType.<long[]> asPrimitives(long.class, Iterator.range(from, toExclusive)));
+        return ofAll(ArrayType.<long[]> asPrimitives(long.class, Iterator.range(from, toExclusive)));
     }
 
     /**
@@ -373,20 +374,20 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @throws IllegalArgumentException if {@code step} is zero
      */
     public static Vector<Long> rangeBy(long from, long toExclusive, long step) {
-        return ofAll(LeafType.<long[]> asPrimitives(long.class, Iterator.rangeBy(from, toExclusive, step)));
+        return ofAll(ArrayType.<long[]> asPrimitives(long.class, Iterator.rangeBy(from, toExclusive, step)));
     }
 
     public static Vector<Character> rangeClosed(char from, char toInclusive) {
-        return ofAll(LeafType.<char[]> asPrimitives(char.class, Iterator.rangeClosed(from, toInclusive)));
+        return ofAll(ArrayType.<char[]> asPrimitives(char.class, Iterator.rangeClosed(from, toInclusive)));
     }
 
     public static Vector<Character> rangeClosedBy(char from, char toInclusive, int step) {
-        return ofAll(LeafType.<char[]> asPrimitives(char.class, Iterator.rangeClosedBy(from, toInclusive, step)));
+        return ofAll(ArrayType.<char[]> asPrimitives(char.class, Iterator.rangeClosedBy(from, toInclusive, step)));
     }
 
     @GwtIncompatible
     public static Vector<Double> rangeClosedBy(double from, double toInclusive, double step) {
-        return ofAll(LeafType.<double[]> asPrimitives(double.class, Iterator.rangeClosedBy(from, toInclusive, step)));
+        return ofAll(ArrayType.<double[]> asPrimitives(double.class, Iterator.rangeClosedBy(from, toInclusive, step)));
     }
 
     /**
@@ -406,7 +407,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @return a range of int values as specified or the empty range if {@code from > toInclusive}
      */
     public static Vector<Integer> rangeClosed(int from, int toInclusive) {
-        return ofAll(LeafType.<int[]> asPrimitives(int.class, Iterator.rangeClosed(from, toInclusive)));
+        return ofAll(ArrayType.<int[]> asPrimitives(int.class, Iterator.rangeClosed(from, toInclusive)));
     }
 
     /**
@@ -432,7 +433,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @throws IllegalArgumentException if {@code step} is zero
      */
     public static Vector<Integer> rangeClosedBy(int from, int toInclusive, int step) {
-        return ofAll(LeafType.<int[]> asPrimitives(int.class, Iterator.rangeClosedBy(from, toInclusive, step)));
+        return ofAll(ArrayType.<int[]> asPrimitives(int.class, Iterator.rangeClosedBy(from, toInclusive, step)));
     }
 
     /**
@@ -452,7 +453,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @return a range of long values as specified or the empty range if {@code from > toInclusive}
      */
     public static Vector<Long> rangeClosed(long from, long toInclusive) {
-        return ofAll(LeafType.<long[]> asPrimitives(long.class, Iterator.rangeClosed(from, toInclusive)));
+        return ofAll(ArrayType.<long[]> asPrimitives(long.class, Iterator.rangeClosed(from, toInclusive)));
     }
 
     /**
@@ -478,7 +479,7 @@ public final class Vector<T> implements Kind1<Vector<?>, T>, IndexedSeq<T>, Seri
      * @throws IllegalArgumentException if {@code step} is zero
      */
     public static Vector<Long> rangeClosedBy(long from, long toInclusive, long step) {
-        return ofAll(LeafType.<long[]> asPrimitives(long.class, Iterator.rangeClosedBy(from, toInclusive, step)));
+        return ofAll(ArrayType.<long[]> asPrimitives(long.class, Iterator.rangeClosedBy(from, toInclusive, step)));
     }
 
     /**
