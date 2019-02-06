@@ -95,6 +95,10 @@ public final class Tuple0 implements Tuple, Comparable<Tuple0>, Serializable {
         return List.empty();
     }
 
+    public <T1> Tuple1<T1> concat(T1 t1) {
+        return Tuple.of(t1);
+    }
+
     // -- Object
 
     @Override
