@@ -22,6 +22,7 @@ package io.vavr.collection;
 import io.vavr.PartialFunction;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.Tuple3;
 import io.vavr.control.Option;
 import org.assertj.core.api.IterableAssert;
 import org.junit.Test;
@@ -364,7 +365,7 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
     @Test
     public void shouldConvertToMap() {
         Multimap<Integer, Integer> mm = emptyIntInt().put(1, 2).put(1, 3);
-        assertThat(mm.asMap().get(1).get().mkString(",")).isEqualTo("2,3");
+        assertThat(mm.asMap().get(1).get()).isEqualTo(HashSet.of(2, 3));
     }
 
     // -- biMap
@@ -1038,8 +1039,8 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
     @Test
     public void shouldUnzipNonNil() {
         final Multimap<Integer, Integer> map = emptyIntInt().put(0, 0).put(1, 1);
-        final Tuple actual = map.unzip(entry -> Tuple.of(entry._1, entry._2 + 1));
-        final Tuple expected = Tuple.of(Stream.of(0, 1), Stream.of(1, 2));
+        final Tuple2<?, ?> actual = map.unzip(entry -> Tuple.of(entry._1, entry._2 + 1));
+        final Tuple2<?, ?> expected = Tuple.of(Stream.of(0, 1), Stream.of(1, 2));
         assertThat(actual).isEqualTo(expected);
     }
 
@@ -1053,8 +1054,8 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
     @Test
     public void shouldUnzip3NonNil() {
         final Multimap<Integer, Integer> map = emptyIntInt().put(0, 0).put(1, 1);
-        final Tuple actual = map.unzip3(entry -> Tuple.of(entry._1, entry._2 + 1, entry._2 + 5));
-        final Tuple expected = Tuple.of(Stream.of(0, 1), Stream.of(1, 2), Stream.of(5, 6));
+        final Tuple3<?, ?, ?> actual = map.unzip3(entry -> Tuple.of(entry._1, entry._2 + 1, entry._2 + 5));
+        final Tuple3<?, ?, ?> expected = Tuple.of(Stream.of(0, 1), Stream.of(1, 2), Stream.of(5, 6));
         assertThat(actual).isEqualTo(expected);
     }
 

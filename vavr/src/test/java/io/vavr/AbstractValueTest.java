@@ -20,7 +20,6 @@
 package io.vavr;
 
 import io.vavr.collection.*;
-import io.vavr.collection.List;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import io.vavr.control.Validation;
@@ -218,34 +217,6 @@ public abstract class AbstractValueTest {
         assertThat(of(1).isLazy()).isFalse();
     }
 
-    // -- peek
-
-    @Test
-    public void shouldPeekNil() {
-        assertThat(empty().peek(t -> {})).isEqualTo(empty());
-    }
-
-    @Test
-    public void shouldPeekNonNilPerformingNoAction() {
-        assertThat(of(1).peek(t -> {})).isEqualTo(of(1));
-    }
-
-    @Test
-    public void shouldPeekSingleValuePerformingAnAction() {
-        final int[] effect = { 0 };
-        final Value<Integer> actual = of(1).peek(i -> effect[0] = i);
-        assertThat(actual).isEqualTo(of(1));
-        assertThat(effect[0]).isEqualTo(1);
-    }
-
-    @Test
-    public void shouldPeekNonNilPerformingAnAction() {
-        final int[] effect = { 0 };
-        final Value<Integer> actual = of(1, 2, 3).peek(i -> effect[0] = i);
-        assertThat(actual).isEqualTo(of(1, 2, 3)); // traverses all elements in the lazy case
-        assertThat(effect[0]).isEqualTo(getPeekNonNilPerformingAnAction());
-    }
-
     // -- Conversions toXxx()
 
     @Test
@@ -369,26 +340,6 @@ public abstract class AbstractValueTest {
     }
 
     @Test
-    public void shouldConvertToOption() {
-        assertThat(empty().toOption()).isSameAs(Option.none());
-        assertThat(of(1).toOption()).isEqualTo(Option.of(1));
-    }
-
-    @Test
-    public void shouldConvertToEither() {
-        assertThat(empty().toEither("test")).isEqualTo(Left("test"));
-        assertThat(empty().toEither(() -> "test")).isEqualTo(Left("test"));
-        assertThat(of(1).toEither("test")).isEqualTo(Right(1));
-    }
-
-    @Test
-    public void shouldConvertToValidation() {
-        assertThat(empty().toValid("test")).isEqualTo(Invalid("test"));
-        assertThat(empty().toValid(() -> "test")).isEqualTo(Invalid("test"));
-        assertThat(of(1).toValid("test")).isEqualTo(Valid(1));
-    }
-
-    @Test
     public void shouldConvertToQueue() {
         final Value<Integer> value = of(1, 2, 3);
         final io.vavr.collection.Queue<Integer> queue = value.toQueue();
@@ -471,11 +422,17 @@ public abstract class AbstractValueTest {
 
     @Test(expected = ClassCastException.class)
     public void shouldThrowOnConvertToSortedSetWithoutComparatorOnNonComparable() {
-        final Value<StringBuilder> value = of(new StringBuilder("3"), new StringBuilder("7"), new StringBuilder("1"), new StringBuilder("15"), new StringBuilder("0"));
-        final io.vavr.collection.SortedSet<StringBuilder> set = value.toSortedSet();
+        class NonComparable {
+            final String s;
+            NonComparable(String s) {
+                this.s = s;
+            }
+        }
+        final Value<NonComparable> value = of(new NonComparable("3"), new NonComparable("7"), new NonComparable("1"), new NonComparable("15"), new NonComparable("0"));
+        final io.vavr.collection.SortedSet<NonComparable> set = value.toSortedSet();
         if (value.isSingleValued()) {
             //Comparator is not used yet
-            set.add(new StringBuilder("7"));
+            set.add(new NonComparable("7"));
         }
     }
 
@@ -511,30 +468,6 @@ public abstract class AbstractValueTest {
     }
 
     @Test
-    public void shouldConvertNonEmptyToTry() {
-        assertThat(of(1, 2, 3).toTry()).isEqualTo(Try.of(() -> 1));
-    }
-
-    @Test
-    public void shouldConvertEmptyToTry() {
-        final Try<?> actual = empty().toTry();
-        assertThat(actual.isFailure()).isTrue();
-        assertThat(actual.getCause()).isExactlyInstanceOf(NoSuchElementException.class);
-    }
-
-    @Test
-    public void shouldConvertNonEmptyToTryUsingExceptionSupplier() {
-        final Exception x = new Exception("test");
-        assertThat(of(1, 2, 3).toTry(() -> x)).isEqualTo(Try.of(() -> 1));
-    }
-
-    @Test
-    public void shouldConvertEmptyToTryUsingExceptionSupplier() {
-        final Exception x = new Exception("test");
-        assertThat(empty().toTry(() -> x)).isEqualTo(Try.failure(x));
-    }
-
-    @Test
     public void shouldConvertToVector() {
         final Value<Integer> value = of(1, 2, 3);
         final io.vavr.collection.Vector<Integer> vector = value.toVector();
@@ -557,8 +490,20 @@ public abstract class AbstractValueTest {
     }
 
     @Test
+    public void shouldConvertToJavaArrayWithFactory() {
+        final Value<Integer> value = of(1, 2, 3);
+        final Integer[] ints = value.toJavaArray(Integer[]::new);
+        if (value.isSingleValued()) {
+            assertThat(ints).containsOnly(1);
+        } else {
+            assertThat(ints).containsOnly(1, 2, 3);
+        }
+    }
+
+    @Test
     public void shouldConvertToJavaArrayWithTypeHint() {
         final Value<Integer> value = of(1, 2, 3);
+        @SuppressWarnings("deprecation")
         final Integer[] ints = value.toJavaArray(Integer.class);
         if (value.isSingleValued()) {
             assertThat(ints).containsOnly(1);
@@ -570,6 +515,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveBoolean() {
         final Value<Boolean> value = of(true, false);
+        @SuppressWarnings("deprecation")
         final Boolean[] array = value.toJavaArray(boolean.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly(true);
@@ -581,6 +527,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveByte() {
         final Value<Byte> value = of((byte) 1, (byte) 2);
+        @SuppressWarnings("deprecation")
         final Byte[] array = value.toJavaArray(byte.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly((byte) 1);
@@ -592,6 +539,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveChar() {
         final Value<Character> value = of('a', 'b');
+        @SuppressWarnings("deprecation")
         final Character[] array = value.toJavaArray(char.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly('a');
@@ -603,6 +551,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveDouble() {
         final Value<Double> value = of(.1, .2);
+        @SuppressWarnings("deprecation")
         final Double[] array = value.toJavaArray(double.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly(.1);
@@ -614,6 +563,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveFloat() {
         final Value<Float> value = of(.1f, .2f);
+        @SuppressWarnings("deprecation")
         final Float[] array = value.toJavaArray(float.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly(.1f);
@@ -625,6 +575,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveInt() {
         final Value<Integer> value = of(1, 2);
+        @SuppressWarnings("deprecation")
         final Integer[] array = value.toJavaArray(int.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly(1);
@@ -636,6 +587,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveLong() {
         final Value<Long> value = of(1L, 2L);
+        @SuppressWarnings("deprecation")
         final Long[] array = value.toJavaArray(long.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly(1L);
@@ -647,6 +599,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveShort() {
         final Value<Short> value = of((short) 1, (short) 2);
+        @SuppressWarnings("deprecation")
         final Short[] array = value.toJavaArray(short.class);
         if (value.isSingleValued()) {
             assertThat(array).containsOnly((short) 1);
@@ -658,6 +611,7 @@ public abstract class AbstractValueTest {
     @Test
     public void shouldConvertToJavaArrayWithTypeHintPrimitiveVoid() {
         final Value<Void> value = of((Void) null);
+        @SuppressWarnings("deprecation")
         final Void[] array = value.toJavaArray(void.class);
         assertThat(array).containsOnly((Void) null);
     }
@@ -729,11 +683,6 @@ public abstract class AbstractValueTest {
     }
 
     @Test
-    public void shouldConvertToJavaOptional() {
-        assertThat(of(1, 2, 3).toJavaOptional()).isEqualTo(Optional.of(1));
-    }
-
-    @Test
     public void shouldConvertToJavaSet() {
         final Value<Integer> value = of(1, 2, 3);
         final java.util.Set<Integer> set = value.toJavaSet();
@@ -782,98 +731,6 @@ public abstract class AbstractValueTest {
             final java.util.stream.Stream<Integer> s2 = java.util.stream.Stream.of(1, 2, 3);
             assertThat(io.vavr.collection.List.ofAll(s1::iterator)).isEqualTo(io.vavr.collection.List.ofAll(s2::iterator));
         }
-    }
-
-    // toLeft / toRight
-
-    @Test
-    public void shouldConvertToEitherLeftFromValueSupplier() {
-        final Either<Integer, String> either = of(0).toLeft(() -> "fallback");
-        assertThat(either.isLeft()).isTrue();
-        assertThat(either.getLeft()).isEqualTo(0);
-
-        final Either<Object, String> either2 = empty().toLeft(() -> "fallback");
-        assertThat(either2.isRight()).isTrue();
-        assertThat(either2.get()).isEqualTo("fallback");
-    }
-
-    @Test
-    public void shouldConvertToEitherLeftFromValue() {
-        final Either<Integer, String> either = of(0).toLeft("fallback");
-        assertThat(either.isLeft()).isTrue();
-        assertThat(either.getLeft()).isEqualTo(0);
-
-        final Either<Object, String> either2 = empty().toLeft("fallback");
-        assertThat(either2.isRight()).isTrue();
-        assertThat(either2.get()).isEqualTo("fallback");
-    }
-
-    @Test
-    public void shouldConvertToEitherRightFromValueSupplier() {
-        final Either<String, Integer> either = of(0).toRight(() -> "fallback");
-        assertThat(either.isRight()).isTrue();
-        assertThat(either.get()).isEqualTo(0);
-
-        final Either<String, Object> either2 = empty().toRight(() -> "fallback");
-        assertThat(either2.isLeft()).isTrue();
-        assertThat(either2.getLeft()).isEqualTo("fallback");
-    }
-
-    @Test
-    public void shouldConvertToEitherRightFromValue() {
-        final Either<String, Integer> either = of(0).toRight("fallback");
-        assertThat(either.isRight()).isTrue();
-        assertThat(either.get()).isEqualTo(0);
-
-        final Either<String, Object> either2 = empty().toRight("fallback");
-        assertThat(either2.isLeft()).isTrue();
-        assertThat(either2.getLeft()).isEqualTo("fallback");
-    }
-
-    // toValid / toInvalid
-
-    @Test
-    public void shouldConvertToValidationInvalidFromValueSupplier() {
-        final Validation<Integer, String> validation = of(0).toInvalid(() -> "fallback");
-        assertThat(validation.isInvalid()).isTrue();
-        assertThat(validation.getErrors()).isEqualTo(List.of(0));
-
-        final Validation<Object, String> validation2 = empty().toInvalid(() -> "fallback");
-        assertThat(validation2.isValid()).isTrue();
-        assertThat(validation2.get()).isEqualTo("fallback");
-    }
-
-    @Test
-    public void shouldConvertToValidationInvalidFromValue() {
-        final Validation<Integer, String> validation = of(0).toInvalid("fallback");
-        assertThat(validation.isInvalid()).isTrue();
-        assertThat(validation.getErrors()).isEqualTo(List.of(0));
-
-        final Validation<Object, String> validation2 = empty().toInvalid("fallback");
-        assertThat(validation2.isValid()).isTrue();
-        assertThat(validation2.get()).isEqualTo("fallback");
-    }
-
-    @Test
-    public void shouldConvertToValidationRightFromValueSupplier() {
-        final Validation<String, Integer> validation = of(0).toValid(() -> "fallback");
-        assertThat(validation.isValid()).isTrue();
-        assertThat(validation.get()).isEqualTo(0);
-
-        final Validation<String, Object> validation2 = empty().toValid(() -> "fallback");
-        assertThat(validation2.isInvalid()).isTrue();
-        assertThat(validation2.getErrors()).isEqualTo(List.of("fallback"));
-    }
-
-    @Test
-    public void shouldConvertToValidationValidFromValue() {
-        final Validation<String, Integer> validation = of(0).toValid("fallback");
-        assertThat(validation.isValid()).isTrue();
-        assertThat(validation.get()).isEqualTo(0);
-
-        final Validation<String, Object> validation2 = empty().toValid("fallback");
-        assertThat(validation2.isInvalid()).isTrue();
-        assertThat(validation2.getErrors()).isEqualTo(List.of("fallback"));
     }
 
     // -- exists
@@ -969,8 +826,6 @@ public abstract class AbstractValueTest {
         final boolean actual = nonEmpty instanceof Serializable;
         final boolean expected = Match(nonEmpty).of(
                 Case($(anyOf(
-                        instanceOf(Either.LeftProjection.class),
-                        instanceOf(Either.RightProjection.class),
                         instanceOf(Future.class),
                         instanceOf(io.vavr.collection.Iterator.class)
                 )), false),

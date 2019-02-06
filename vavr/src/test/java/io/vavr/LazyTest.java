@@ -19,10 +19,8 @@
  */
 package io.vavr;
 
-import io.vavr.collection.Seq;
 import io.vavr.control.Try;
 import io.vavr.collection.Iterator;
-import io.vavr.collection.List;
 import io.vavr.collection.Vector;
 import io.vavr.control.Option;
 import org.junit.Test;
@@ -33,7 +31,6 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -46,7 +43,7 @@ public class LazyTest extends AbstractValueTest {
     protected <T> Undefined<T> empty() {
         return (Undefined<T>) Undefined.INSTANCE;
     }
-    
+
     @Override
     protected <T> Lazy<T> of(T element) {
         return Lazy.of(() -> element);
@@ -110,61 +107,34 @@ public class LazyTest extends AbstractValueTest {
         assertThat(iterator.hasNext()).isFalse();
     }
 
-    // -- peek
+    // -- flatMap
 
     @Test
-    public void shouldPeek() {
-        final Lazy<Integer> lazy = Lazy.of(() -> 1);
-        final Lazy<Integer> peek = lazy.peek(v -> assertThat(v).isEqualTo(1));
-        assertThat(peek).isSameAs(lazy);
-    }
-
-    // -- sequence(Iterable)
-
-    @Test
-    public void shouldSequenceEmpty() {
-        final List<Lazy<Integer>> testee = List.empty();
-        final Lazy<Seq<Integer>> sequence = Lazy.sequence(testee);
-        assertThat(sequence.get()).isEqualTo(Vector.empty());
-    }
-
-    @Test
-    public void shouldSequenceNonEmptyLazy() {
-        final List<Lazy<Integer>> testee = List.of(1, 2, 3).map(i -> Lazy.of(() -> i));
-        final Lazy<Seq<Integer>> sequence = Lazy.sequence(testee);
-        assertThat(sequence.get()).isEqualTo(Vector.of(1, 2, 3));
-    }
-
-    @Test
-    public void shouldNotEvaluateEmptySequence() {
-        final List<Lazy<Integer>> testee = List.empty();
-        final Lazy<Seq<Integer>> sequence = Lazy.sequence(testee);
-        assertThat(sequence.isEvaluated()).isFalse();
-    }
-
-    @Test
-    public void shouldNotEvaluateNonEmptySequence() {
-        final List<Lazy<Integer>> testee = List.of(1, 2, 3).map(i -> Lazy.of(() -> i));
-        final Lazy<Seq<Integer>> sequence = Lazy.sequence(testee);
-        assertThat(sequence.isEvaluated()).isFalse();
-    }
-
-    @Test
-    public void shouldMapOverLazyValue() {
+    public void shouldFlatMapLazyValue() {
         final Lazy<Integer> testee = Lazy.of(() -> 42);
         final Lazy<Integer> expected = Lazy.of(() -> 21);
+        assertThat(testee.flatMap(i -> Lazy.of(() -> i / 2))).isEqualTo(expected);
+    }
 
+    // -- map
+
+    @Test
+    public void shouldMapLazyValue() {
+        final Lazy<Integer> testee = Lazy.of(() -> 42);
+        final Lazy<Integer> expected = Lazy.of(() -> 21);
         assertThat(testee.map(i -> i / 2)).isEqualTo(expected);
     }
+
+    // -- filter
 
     @Test
     public void shouldFilterOverLazyValue() {
         final Lazy<Integer> testee = Lazy.of(() -> 42);
-        final Lazy<Option<Integer>> expectedPositive = Lazy.of(() -> Option.some(42));
-        final Lazy<Option<Integer>> expectedNegative = Lazy.of(Option::none);
+        final Lazy<Integer> expectedPositive = Lazy.of(() -> 42);
+        final Lazy<Integer> expectedNegative = Lazy.of(() -> -1);
 
-        assertThat(testee.filter(i -> i % 2 == 0)).isEqualTo(expectedPositive);
-        assertThat(testee.filter(i -> i % 2 != 0)).isEqualTo(expectedNegative);
+        assertThat(testee.filter(i -> i % 2 == 0, i -> -1)).isEqualTo(expectedPositive);
+        assertThat(testee.filter(i -> i % 2 != 0, i -> -1)).isEqualTo(expectedNegative);
     }
 
     @Test
@@ -422,11 +392,6 @@ final class Undefined<T> implements Value<T>, Serializable {
     @Override
     public boolean isSingleValued() {
         return prototype.isSingleValued();
-    }
-
-    @Override
-    public Value<T> peek(Consumer<? super T> action) {
-        return this;
     }
 
     @Override

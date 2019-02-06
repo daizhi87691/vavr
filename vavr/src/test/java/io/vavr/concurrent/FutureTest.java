@@ -896,19 +896,6 @@ public class FutureTest extends AbstractValueTest {
         assertThat(Try.of(completableFuture::get).get()).isEqualTo(42);
     }
 
-    // -- toTry()
-
-    @Test
-    public void shouldConvertSuccessfulFutureToTry() {
-        assertThat(Future.successful(1).toTry()).isEqualTo(Try.success(1));
-    }
-
-    @Test
-    public void shouldConvertFailedFutureToTry() {
-        assertThat(Future.failed(new Error("!")).toTry())
-                .isEqualTo(Try.failure(new Error("!")));
-    }
-
     // -- transform()
 
     @Test
@@ -1045,14 +1032,6 @@ public class FutureTest extends AbstractValueTest {
         final Future<Integer> future = Future.of(zZz(42)).map(i -> i * 2);
         future.await();
         assertThat(future.get()).isEqualTo(84);
-    }
-
-    @Test
-    public void shouldPeekFuture() {
-        final int[] consumer = new int[] { -1 };
-        Future.of(zZz(42)).peek(i -> consumer[0] = i);
-        waitUntil(() -> consumer[0] > 0);
-        assertThat(consumer[0]).isEqualTo(42);
     }
 
     @Test
