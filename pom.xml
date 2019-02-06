@@ -4,40 +4,46 @@ Before creating a pull request, the following goals should be executed locally:
 
 * Executing tests: `mvn clean test`
 * Executing doclint: `mvn javadoc:javadoc`
-
-Tests & Code coverage:
-
-* Executing benchmark assertions: `mvn clean test -Pbenchmark`
-* Executing benchmarks (long running!): `mvn test -Pbenchmark -pl vavr-benchmark`
 * Executing code coverage report: `mvn -P ci clean test jacoco:report`
+
+Run benchmarks:
+
+* `mvn test -Pbenchmark -pl javaslang`
 
 We use these goals frequently to keep the dependencies and plugins up-to-date:
 
 * Update version properties: `mvn versions:update-properties`
 * Check for new plugin version: `mvn versions:display-plugin-updates`
 
+Note: The maven build currently needs to be started from the javaslang root dir
+      because the code generators write to hard-coded relative directories.
+
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>9</version>
     </parent>
-    <groupId>io.vavr</groupId>
-    <artifactId>vavr-parent</artifactId>
-    <version>0.10.1-SNAPSHOT</version>
+    <groupId>io.javaslang</groupId>
+    <artifactId>javaslang-parent</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Vavr Parent</name>
-    <description>Vavr (formerly called Javaslang) is an object-functional language extension to Java 8+.</description>
+    <name>Javaslang Parent</name>
+    <description>Javaslang is a Java standard library extension built for Java 8 and above.</description>
     <modules>
-        <module>vavr</module>
-        <module>vavr-benchmark</module>
-        <module>vavr-match</module>
-        <module>vavr-match-processor</module>
-        <module>vavr-test</module>
+        <module>javaslang</module>
+        <module>javaslang-benchmark</module>
+        <module>javaslang-match</module>
+        <module>javaslang-pure</module>
+        <module>javaslang-test</module>
     </modules>
-    <url>http://vavr.io</url>
+    <url>http://javaslang.io</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -46,9 +52,9 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:vavr-io/vavr.git</connection>
-        <developerConnection>scm:git:git@github.com:vavr-io/vavr.git</developerConnection>
-        <url>git@github.com:vavr-io/vavr.git</url>
+        <connection>scm:git:git@github.com:javaslang/javaslang.git</connection>
+        <developerConnection>scm:git:git@github.com:javaslang/javaslang.git</developerConnection>
+        <url>git@github.com:javaslang/javaslang.git</url>
         <tag>HEAD</tag>
     </scm>
     <developers>
@@ -60,30 +66,30 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <assertj.core.version>3.11.1</assertj.core.version>
+        <assertj.core.version>3.5.2</assertj.core.version>
         <eclipse.lifecycle.mapping.version>1.0.0</eclipse.lifecycle.mapping.version>
         <java.version>1.8</java.version>
-        <jmh.version>1.21</jmh.version>
-        <junit.version>4.13-beta-1</junit.version>
-        <maven.enforcer.version>3.0.0-M2</maven.enforcer.version>
-        <maven.build-helper.version>3.0.0</maven.build-helper.version>
-        <maven.bundle.version>4.1.0</maven.bundle.version>
-        <maven.clean.version>3.1.0</maven.clean.version>
-        <maven.install.version>3.0.0-M1</maven.install.version>
-        <maven.compiler.version>3.8.0</maven.compiler.version>
-        <maven.deploy.version>3.0.0-M1</maven.deploy.version>
+        <jmh.version>1.14</jmh.version>
+        <junit.version>4.12</junit.version>
+        <gwt.version>2.8.0-SNAPSHOT</gwt.version>
+        <maven.build-helper.version>1.12</maven.build-helper.version>
+        <maven.bundle.version>3.2.0</maven.bundle.version>
+        <maven.clean.version>3.0.0</maven.clean.version>
+        <maven.install.version>2.5.2</maven.install.version>
+        <maven.compiler.version>3.5.1</maven.compiler.version>
+        <maven.deploy.version>2.8.2</maven.deploy.version>
         <maven.gpg.version>1.6</maven.gpg.version>
-        <maven.jacoco.version>0.8.2</maven.jacoco.version>
-        <maven.jar.version>3.1.1</maven.jar.version>
-        <maven.javadoc.version>3.0.1</maven.javadoc.version>
+        <maven.jacoco.version>0.7.7.201606060606</maven.jacoco.version>
+        <maven.jar.version>3.0.2</maven.jar.version>
+        <maven.javadoc.version>2.10.4</maven.javadoc.version>
         <maven.release.version>2.5.3</maven.release.version>
-        <maven.versions.version>2.7</maven.versions.version>
-        <maven.surefire.version>3.0.0-M3</maven.surefire.version>
+        <maven.versions.version>2.3</maven.versions.version>
+        <maven.surefire.version>2.19.1</maven.surefire.version>
         <maven.source.version>3.0.1</maven.source.version>
         <maven.exec.version>1.5.0</maven.exec.version>
-        <scala.maven.version>3.4.4</scala.maven.version>
-        <scala.version>2.12.6</scala.version>
-        <scala.compat.version>2.12</scala.compat.version>
+        <maven.gwt.plugin>1.0-rc-6</maven.gwt.plugin>
+        <scala.maven.version>3.2.2</scala.maven.version>
+        <scala.version>2.11.7</scala.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -99,34 +105,28 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${jmh.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <version>${jmh.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt-user</artifactId>
+                <version>${gwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt-dev</artifactId>
+                <version>${gwt.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${maven.enforcer.version}</version>
-                <executions>
-                    <execution>
-                        <id>enforce-maven</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.5.3</version>
-                                    <message>Minimum required Maven version to build vavr is 3.5.3</message>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
@@ -147,7 +147,7 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                     <executions>
                         <execution>
                             <id>attach-sources</id>
-                            <phase>prepare-package</phase>
+                            <phase>generate-resources</phase>
                             <goals>
                                 <goal>jar-no-fork</goal>
                                 <goal>test-jar-no-fork</goal>
@@ -182,8 +182,6 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                     <version>${scala.maven.version}</version>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
-                        <scalaCompatVersion>${scala.compat.version}</scalaCompatVersion>
-                        <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
                     </configuration>
                     <executions>
                         <execution>
@@ -192,7 +190,6 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                                 <goal>script</goal>
                             </goals>
                             <configuration>
-                                <includeScopes>plugin</includeScopes>
                                 <scriptFile>${project.basedir}/generator/Generator.scala</scriptFile>
                             </configuration>
                         </execution>
@@ -226,7 +223,6 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                             <configuration>
                                 <sources>
                                     <source>${project.basedir}/src-gen/main/java</source>
-                                    <source>${project.build.directory}/generated-sources/annotations</source>
                                 </sources>
                             </configuration>
                         </execution>
@@ -239,7 +235,6 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                             <configuration>
                                 <sources>
                                     <source>${project.basedir}/src-gen/test/java</source>
-                                    <source>${project.build.directory}/generated-test-sources/test-annotations</source>
                                 </sources>
                             </configuration>
                         </execution>
@@ -255,12 +250,10 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                         <showDeprecation>true</showDeprecation>
                         <showWarnings>true</showWarnings>
                         <compilerArgs>
-                            <arg>-Werror</arg>
                             <arg>-Xlint:all</arg>
+                            <arg>-Werror</arg>
                             <!-- Workaround for JDK bug https://bugs.openjdk.java.net/browse/JDK-6999068 -->
                             <arg>-Xlint:-processing</arg>
-                            <!-- Enable Java 9 compilation with 1.8 compatibility -->
-                            <arg>-Xlint:-options</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
@@ -288,7 +281,6 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                         <links>
                             <link>https://docs.oracle.com/javase/8/docs/api/</link>
                         </links>
-                        <stylesheetfile>${basedir}/../.javadoc/stylesheet.css</stylesheetfile>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -306,23 +298,21 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
-                    <configuration>
-                        <!-- ForkJoinPool parallelism for io.vavr.concurrent.Future.
-	                             Typically this is the number of cores by default.
-	                             In the travis-ci build env this is currently set to 1. -->
-                        <!--<argLine>-Djava.util.concurrent.ForkJoinPool.common.parallelism=1</argLine>-->
-                        <parallel>all</parallel>
-                        <threadCount>4</threadCount>
-                        <reuseForks>true</reuseForks>
-                    </configuration>
+                    <groupId>net.ltgt.gwt.maven</groupId>
+                    <artifactId>gwt-maven-plugin</artifactId>
+                    <version>${maven.gwt.plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
     <profiles>
+        <profile>
+            <id>gwt</id>
+            <modules>
+                <module>javaslang-gwt</module>
+                <module>javaslang-gwt/example</module>
+            </modules>
+        </profile>
         <!-- A profile for code coverage analysis in ci environments -->
         <profile>
             <id>ci</id>
@@ -414,7 +404,7 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore />
+                                                <ignore/>
                                             </action>
                                         </pluginExecution>
                                         <pluginExecution>
@@ -427,7 +417,7 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore />
+                                                <ignore/>
                                             </action>
                                         </pluginExecution>
                                         <pluginExecution>
@@ -440,7 +430,7 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore />
+                                                <ignore/>
                                             </action>
                                         </pluginExecution>
                                         <pluginExecution>
@@ -453,7 +443,7 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore />
+                                                <ignore/>
                                             </action>
                                         </pluginExecution>
                                     </pluginExecutions>
@@ -484,27 +474,14 @@ We use these goals frequently to keep the dependencies and plugins up-to-date:
                                     <executable>java</executable>
                                     <arguments>
                                         <argument>-classpath</argument>
-                                        <classpath />
-                                        <argument>io.vavr.JmhRunner</argument>
+                                        <classpath/>
+                                        <argument>javaslang.JmhRunner</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <version>${maven.surefire.version}</version>
-                            <configuration>
-                                <!-- Fixes "Unable to acquire the JMH lock" error -->
-                                <parallel>none</parallel>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
             </build>
         </profile>
     </profiles>
