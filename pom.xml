@@ -4,48 +4,39 @@ Before creating a pull request, the following goals should be executed locally:
 
 * Executing tests: `mvn clean test`
 * Executing doclint: `mvn javadoc:javadoc`
+
+Tests & Code coverage:
+
+* Executing benchmark assertions: `mvn clean test -Pbenchmark`
+* Executing benchmarks (long running!): `mvn test -Pbenchmark -pl vavr-benchmark`
 * Executing code coverage report: `mvn -P ci clean test jacoco:report`
-
-Run benchmarks:
-
-* `mvn test -Pbenchmark -pl javaslang`
 
 We use these goals frequently to keep the dependencies and plugins up-to-date:
 
 * Update version properties: `mvn versions:update-properties`
 * Check for new plugin version: `mvn versions:display-plugin-updates`
 
-Note: The maven build currently needs to be started from the javaslang root dir
-      because the code generators write to hard-coded relative directories.
-
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>9</version>
     </parent>
-    <groupId>io.javaslang</groupId>
-    <artifactId>javaslang-parent</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <groupId>io.vavr</groupId>
+    <artifactId>vavr-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Javaslang Parent</name>
-    <description>Javaslang is a Java standard library extension built for Java 8 and above.</description>
+    <name>Vavr Parent</name>
+    <description>Vavr (formerly called Javaslang) is an object-functional language extension to Java 8+.</description>
     <modules>
-        <module>javaslang</module>
-        <module>javaslang-gwt</module>
-        <module>javaslang-gwt-example</module>
-        <module>javaslang-benchmark</module>
-        <module>javaslang-match</module>
-        <module>javaslang-pure</module>
-        <module>javaslang-test</module>
+        <module>vavr</module>
+        <module>vavr-benchmark</module>
+        <module>vavr-match</module>
+        <module>vavr-test</module>
     </modules>
-    <url>http://javaslang.io</url>
+    <url>http://vavr.io</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -54,9 +45,9 @@ Note: The maven build currently needs to be started from the javaslang root dir
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:javaslang/javaslang.git</connection>
-        <developerConnection>scm:git:git@github.com:javaslang/javaslang.git</developerConnection>
-        <url>git@github.com:javaslang/javaslang.git</url>
+        <connection>scm:git:git@github.com:vavr-io/vavr.git</connection>
+        <developerConnection>scm:git:git@github.com:vavr-io/vavr.git</developerConnection>
+        <url>git@github.com:vavr-io/vavr.git</url>
         <tag>HEAD</tag>
     </scm>
     <developers>
@@ -68,30 +59,31 @@ Note: The maven build currently needs to be started from the javaslang root dir
     </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <assertj.core.version>3.5.2</assertj.core.version>
+        <assertj.core.version>3.8.0</assertj.core.version>
         <eclipse.lifecycle.mapping.version>1.0.0</eclipse.lifecycle.mapping.version>
         <java.version>1.8</java.version>
-        <jmh.version>1.15</jmh.version>
+        <jmh.version>1.19</jmh.version>
         <junit.version>4.12</junit.version>
         <gwt.version>2.8.0</gwt.version>
-        <maven.build-helper.version>1.12</maven.build-helper.version>
-        <maven.bundle.version>3.2.0</maven.bundle.version>
+        <maven.enforcer.version>3.0.0-M1</maven.enforcer.version>
+        <maven.build-helper.version>3.0.0</maven.build-helper.version>
+        <maven.bundle.version>3.3.0</maven.bundle.version>
         <maven.clean.version>3.0.0</maven.clean.version>
         <maven.install.version>2.5.2</maven.install.version>
-        <maven.compiler.version>3.5.1</maven.compiler.version>
+        <maven.compiler.version>3.7.0</maven.compiler.version>
         <maven.deploy.version>2.8.2</maven.deploy.version>
         <maven.gpg.version>1.6</maven.gpg.version>
-        <maven.jacoco.version>0.7.7.201606060606</maven.jacoco.version>
+        <maven.jacoco.version>0.7.9</maven.jacoco.version>
         <maven.jar.version>3.0.2</maven.jar.version>
-        <maven.javadoc.version>2.10.4</maven.javadoc.version>
+        <maven.javadoc.version>3.0.0-M1</maven.javadoc.version>
         <maven.release.version>2.5.3</maven.release.version>
-        <maven.versions.version>2.3</maven.versions.version>
+        <maven.versions.version>2.4</maven.versions.version>
         <maven.surefire.version>2.19.1</maven.surefire.version>
         <maven.source.version>3.0.1</maven.source.version>
         <maven.exec.version>1.5.0</maven.exec.version>
         <maven.gwt.plugin>1.0-rc-6</maven.gwt.plugin>
-        <scala.maven.version>3.2.2</scala.maven.version>
-        <scala.version>2.11.7</scala.version>
+        <scala.maven.version>3.3.1</scala.maven.version>
+        <scala.version>2.12.2</scala.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -107,11 +99,6 @@ Note: The maven build currently needs to be started from the javaslang root dir
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-core</artifactId>
-                <version>${jmh.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <version>${jmh.version}</version>
             </dependency>
@@ -119,6 +106,26 @@ Note: The maven build currently needs to be started from the javaslang root dir
     </dependencyManagement>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven.enforcer.version}</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0.5</version>
+                                </requireMavenVersion>
+                            </rules> 
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
@@ -182,6 +189,7 @@ Note: The maven build currently needs to be started from the javaslang root dir
                                 <goal>script</goal>
                             </goals>
                             <configuration>
+                                <includeScopes>plugin</includeScopes>
                                 <scriptFile>${project.basedir}/generator/Generator.scala</scriptFile>
                             </configuration>
                         </execution>
@@ -242,10 +250,12 @@ Note: The maven build currently needs to be started from the javaslang root dir
                         <showDeprecation>true</showDeprecation>
                         <showWarnings>true</showWarnings>
                         <compilerArgs>
-                            <arg>-Xlint:all</arg>
                             <arg>-Werror</arg>
+                            <arg>-Xlint:all</arg>
                             <!-- Workaround for JDK bug https://bugs.openjdk.java.net/browse/JDK-6999068 -->
                             <arg>-Xlint:-processing</arg>
+                            <!-- Enable Java 9 compilation with 1.8 compatibility -->
+                            <arg>-Xlint:-options</arg>
                         </compilerArgs>
                     </configuration>
                 </plugin>
@@ -273,6 +283,7 @@ Note: The maven build currently needs to be started from the javaslang root dir
                         <links>
                             <link>https://docs.oracle.com/javase/8/docs/api/</link>
                         </links>
+                        <stylesheetfile>${basedir}/../.javadoc/stylesheet.css</stylesheetfile>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -288,6 +299,20 @@ Note: The maven build currently needs to be started from the javaslang root dir
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.version}</version>
+                    <configuration>
+                        <!-- ForkJoinPool parallelism for io.vavr.concurrent.Future.
+                             Typically this is the number of cores by default.
+                             In the travis-ci build env this is currently set to 1. -->
+                        <!--<argLine>-Djava.util.concurrent.ForkJoinPool.common.parallelism=1</argLine>-->
+                        <parallel>all</parallel>
+                        <threadCount>4</threadCount>
+                        <reuseForks>true</reuseForks>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -384,7 +409,7 @@ Note: The maven build currently needs to be started from the javaslang root dir
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore/>
+                                                <ignore />
                                             </action>
                                         </pluginExecution>
                                         <pluginExecution>
@@ -397,7 +422,7 @@ Note: The maven build currently needs to be started from the javaslang root dir
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore/>
+                                                <ignore />
                                             </action>
                                         </pluginExecution>
                                         <pluginExecution>
@@ -410,7 +435,7 @@ Note: The maven build currently needs to be started from the javaslang root dir
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore/>
+                                                <ignore />
                                             </action>
                                         </pluginExecution>
                                         <pluginExecution>
@@ -423,7 +448,7 @@ Note: The maven build currently needs to be started from the javaslang root dir
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
-                                                <ignore/>
+                                                <ignore />
                                             </action>
                                         </pluginExecution>
                                     </pluginExecutions>
@@ -454,14 +479,27 @@ Note: The maven build currently needs to be started from the javaslang root dir
                                     <executable>java</executable>
                                     <arguments>
                                         <argument>-classpath</argument>
-                                        <classpath/>
-                                        <argument>javaslang.JmhRunner</argument>
+                                        <classpath />
+                                        <argument>vavr.JmhRunner</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>${maven.surefire.version}</version>
+                            <configuration>
+                                <!-- Fixes "Unable to acquire the JMH lock" error -->
+                                <parallel>none</parallel>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>

@@ -1,12 +1,12 @@
 # How to Contribute
 
-Javaslang needs to be compiled with **jdk 1.8.0_40** at a minimum, which fixes many type inference bugs of the java compiler.
+Vavr needs to be compiled with **jdk 1.8.0_40** at a minimum, which fixes many type inference bugs of the java compiler.
 
 [Fork](https://help.github.com/articles/fork-a-repo) the GitHub, send a [pull request](https://help.github.com/articles/using-pull-requests) and keep your fork in [sync](https://help.github.com/articles/syncing-a-fork/) with the upstream repository.
 
 ## IDE
 
-We use recent IDE version to develop Javaslang. IntelliJ IDEA is preferred over Eclipse.
+We use recent IDE version to develop Vavr. IntelliJ IDEA is preferred over Eclipse.
 
 Using IntelliJ IDEA, the Community Edition works out-of-the-box. The idea-settings.jar can be found in the repo.
 
@@ -18,7 +18,17 @@ The IDEA settings include:
 
 ## Coding Conventions
 
-Just a few notes here. In general, it is good to look at existing code to get a clear picture.
+We follow _Rob Pike's 5 Rules of Programming_:
+
+> * **Rule 1. You can't tell where a program is going to spend its time.** Bottlenecks occur in surprising places, so don't try to second guess and put in a speed hack until you've proven that's where the bottleneck is.
+> * **Rule 2. Measure.** Don't tune for speed until you've measured, and even then don't unless one part of the code overwhelms the rest.
+> * **Rule 3. Fancy algorithms are slow when n is small, and n is usually small.** Fancy algorithms have big constants. Until you know that n is frequently going to be big, don't get fancy. (Even if n does get big, use Rule 2 first.)
+> * **Rule 4. Fancy algorithms are buggier than simple ones, and they're much harder to implement.** Use simple algorithms as well as simple data structures.
+> * **Rule 5. Data dominates.** If you've chosen the right data structures and organized things well, the algorithms will almost always be self-evident. Data structures, not algorithms, are central to programming.
+>
+> Pike's rules 1 and 2 restate Tony Hoare's famous maxim "Premature optimization is the root of all evil." Ken Thompson rephrased Pike's rules 3 and 4 as "When in doubt, use brute force.". Rules 3 and 4 are instances of the design philosophy KISS. Rule 5 was previously stated by Fred Brooks in The Mythical Man-Month. Rule 5 is often shortened to "write stupid code that uses smart objects".
+
+_Source: http://users.ece.utexas.edu/~adnan/pike.html_
 
 ### Javadoc
 
@@ -27,19 +37,33 @@ Just a few notes here. In general, it is good to look at existing code to get a 
 * A package, which is part of the public API, contains a `package-info.java`.
 * Unit tests contain no javadoc at all (because they introduce no new API and contain no business logic).
 * Running `mvn javadoc:javadoc` results in no javadoc errors.
-* All classes start with the following copyright notice, which contains the list of core developers:
+* All classes start with the following copyright notice in order to apply the Apache-2.0 license:
 
 ```java
-/*     / \____  _    _  ____   ______  / \ ____  __    _______
- *    /  /    \/ \  / \/    \ /  /\__\/  //    \/  \  //  /\__\   JΛVΛSLΛNG
- *  _/  /  /\  \  \/  /  /\  \\__\\  \  //  /\  \ /\\/ \ /__\ \   Copyright 2014-2016 Javaslang, http://javaslang.io
- * /___/\_/  \_/\____/\_/  \_/\__\/__/\__\_/  \_//  \__/\_____/   Licensed under the Apache License, Version 2.0
+/*  __    __  __  __    __  ___
+ * \  \  /  /    \  \  /  /  __/
+ *  \  \/  /  /\  \  \/  /  /
+ *   \____/__/  \__\____/__/
+ *
+ * Copyright 2014-2017 Vavr, http://vavr.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 ```
 
 ### Packages
 
-* There is only one first-level package: javaslang.
+* There is only one first-level package: io.vavr.
 * The maximum package depth is two.
 * Package names are denoted in the singular.
 * Packages are sliced by domain (no util or tool packages).
@@ -67,7 +91,6 @@ We organize our classes and interfaces in the following way:
  * </ul>
  * 
  * @author ...
- * @since ...
  */
 public interface Map<K, V> extends Traversable<Tuple2<K, V>> {
     
@@ -107,7 +130,7 @@ public interface Map<K, V> extends Traversable<Tuple2<K, V>> {
 
 ### 3rd party libraries
 
-* Javaslang has no dependencies other than Java.
+* Vavr has no dependencies other than Java.
 * Unit tests depend solely on junit and assertj.
 * Benchmarks are done with JMH
 
@@ -125,11 +148,11 @@ public interface Map<K, V> extends Traversable<Tuple2<K, V>> {
 
 ### Benchmarks
 
-If you have dedicated hardware (i.e. no virtual machines) and are interested in how Javaslang compares to other alternatives,
-you can run all benchmarks from the `javaslang-benchmark` module via `javaslang.JmhRunner.main` or running the following Maven command:
+If you have dedicated hardware (i.e. no virtual machines) and are interested in how Vavr compares to other alternatives,
+you can run all benchmarks from the `vavr-benchmark` module via `io.vavr.JmhRunner.main` or running the following Maven command:
 
 ```bash
-mvn clean test -P benchmark -pl javaslang-benchmark 
+mvn clean test -P benchmark -pl vavr-benchmark 
 ```
 
 Note: running all the tests will require several hours, during which there should be no other activity done on the given machine.
@@ -165,6 +188,7 @@ Note: Detailed information about performing a release can be found in the SCM se
 * Commits do not mix change sets of different domains/purpose.
 * Commit messages provide enough detail to extract a changelog for a new release.
 
+
 ### Branching Model
 
 We following a simple git workflow/branching model:
@@ -195,13 +219,46 @@ release v2.1.0 - - - - - - + - - - X - - - + 2.1.1-SNAPSHOT
                           ...             ...
 ```
 
+## Versioning
+
+We follow the [Semantic Versioning](http://semver.org) scheme.
+
+### Backward compatibility
+
+We distinguish between 3 kinds of (backward-)compatibilty:
+
+1. **Source** - Source compatibility concerns translating Java source code into class files.
+2. **Binary** - Binary compatibility is [defined](http://java.sun.com/docs/books/jls/third_edition/html/binaryComp.html#13.2) in The Java Language Specification as preserving the ability to link without error.
+3. **Behavioral** - Behavioral compatibility includes the semantics of the code that is executed at runtime.
+
+_Source: [OpenJDK Developers Guide v0.777, Kinds of Compatibility](http://cr.openjdk.java.net/~darcy/OpenJdkDevGuide/OpenJdkDevelopersGuide.v0.777.html#compatibility)_
+
+Given a version number `<major>.<minor>.<path>` Vavr
+
+* may affect **behavioral** compatibility in **all kind of releases**, especially bug fix/patch releases. For example we might decide to release a more effective hashing algorithm in the next minor release that reduces the probability of collisions.
+* may affect **source** compatibility in **patch** releases. For example this may be the case when generic type bounds of method signatures need to be fixed.
+* retains **binary** backwards compatibility (drop in replacement jar) within the same **minor** version (this includes **patch** versions)
+* is not **binary** backward compatible when the **major** version changes
+
+Summing up, drop-in replacements of Vavr can be made for **minor** and **patch** releases.
+
+### Tool Support
+
+We currently check for API changes (which may affect the binary compatibility) using the maven-bundle-plugin:
+
+```bash
+mvn package org.apache.felix:maven-bundle-plugin:baseline -DcomparisonVersion=2.0.1 -DskipTests
+```
+
+In the example above we check API changes between the current branch and the _2.0.1_ tag. In most cases the tag should be the latest official release. 
+
 ### Major release
 
 #### Performing a release
 
 Performing a release requires admin-rights.
 
-1. get a fresh copy of the repo `git clone https://github.com/javaslang/javaslang.git`
+1. get a fresh copy of the repo `git clone https://github.com/vavr-io/vavr.git`
 2. run `mvn clean test` and(!) `mvn javadoc:javadoc` to ensure all is working fine
 3. perform the release
 
@@ -259,7 +316,7 @@ Given a release 1.2.2, we create a bugfix release as follows.
 First, we clone the repository. We work on origin instead of a fork (this requires admin rights).
 
 ```bash
-git clone https://github.com/javaslang/javaslang.git javaslang-1.2.3
+git clone https://github.com/vavr-io/vavr.git vavr-1.2.3
 ```
 
 We checkout the release tag and create a new (local) branch.
@@ -307,4 +364,16 @@ Delete the branch which was pushed by the maven release plugin to origin:
 git checkout master
 git branch -D bugfix-release-1.2.3
 git push origin :bugfix-release-1.2.3
+```
+
+### Release notes
+
+For major, minor and bugfix releases we create release notes on Github.
+
+#### Useful commands
+
+The number of lines changed by author since a specific date:
+
+```bash
+git ls-files -z | xargs -0n1 git blame -w --since="3/18/2016" --line-porcelain | grep -a "^author " | sort -f | uniq -c | sort -n -r
 ```
