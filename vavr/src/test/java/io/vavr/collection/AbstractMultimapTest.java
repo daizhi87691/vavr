@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -193,6 +194,8 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
 
     abstract protected <K extends Comparable<K>, V> Multimap<K, V> mapFill(int n, Supplier<? extends Tuple2<? extends K, ? extends V>> s);
 
+    abstract protected <K extends Comparable<K>, V> Multimap<K, V> mapFill(int n, Tuple2<? extends K, ? extends V> element);
+
     @Override
     protected boolean useIsEqualToInsteadOfIsSameAs() {
         return true;
@@ -336,16 +339,24 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
         assertThat(map).isEqualTo(this.<String, Integer> emptyMap().put("1", 2).put("3", 4));
     }
 
-    // -- apply
+    // -- asPartialFunction
 
     @Test
     public void shouldApplyExistingKey() {
-        assertThat(emptyIntInt().put(1, 2).apply(1)).isEqualTo(io.vavr.collection.HashSet.of(2));
+        assertThat(emptyIntInt().put(1, 2).asPartialFunction().apply(1)).isEqualTo(io.vavr.collection.HashSet.of(2));
     }
 
     @Test(expected = NoSuchElementException.class)
     public void shouldApplyNonExistingKey() {
-        emptyIntInt().put(1, 2).apply(3);
+        emptyIntInt().put(1, 2).asPartialFunction().apply(3);
+    }
+
+    @Test
+    public void shouldImplementPartialFunction() {
+        PartialFunction<Integer, Traversable<String>> f = mapOf(1, "1").asPartialFunction();
+        assertThat(f.isDefinedAt(1)).isTrue();
+        assertThat(f.apply(1).contains("1")).isTrue();
+        assertThat(f.isDefinedAt(2)).isFalse();
     }
 
     // -- asMap
@@ -654,6 +665,33 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
     @Test
     public void shouldFillTheSeqWith0ElementsWhenNIsNegative() {
         assertThat(mapFill(-1, () -> new Tuple2<>(1, 1))).isEqualTo(empty());
+    }
+
+    // -- fill(int, Supplier)
+
+    @Test
+    public void shouldReturnManyMapAfterFillWithConstantSupplier() {
+        AtomicInteger value = new AtomicInteger(83);
+        assertThat(mapFill(17, () -> Tuple.of(7, value.getAndIncrement())))
+                .hasSize(17);
+    }
+
+    // -- fill(int, T)
+
+    @Test
+    public void shouldReturnEmptyAfterFillWithZeroCount() {
+        assertThat(mapFill(0, Tuple.of(7, 83))).isEqualTo(empty());
+    }
+
+    @Test
+    public void shouldReturnEmptyAfterFillWithNegativeCount() {
+        assertThat(mapFill(-1, Tuple.of(7, 83))).isEqualTo(empty());
+    }
+
+    @Test
+    public void shouldReturnManyMapAfterFillWithConstant() {
+        assertThat(mapFill(17, Tuple.of(7, 83)))
+                .hasSize(containerType == Multimap.ContainerType.SEQ ? 17 : 1);
     }
 
     // -- mapTabulate
@@ -1175,16 +1213,6 @@ public abstract class AbstractMultimapTest extends AbstractTraversableTest {
     @Test(expected = NullPointerException.class)
     public void shouldThrowIfZipAllWithThatIsNull() {
         emptyMap().zipAll(null, null, null);
-    }
-
-    // -- PartialFunction
-
-    @Test
-    public void shouldImplementPartialFunction() {
-        PartialFunction<Integer, Traversable<String>> f = mapOf(1, "1");
-        assertThat(f.isDefinedAt(1)).isTrue();
-        assertThat(f.apply(1).contains("1")).isTrue();
-        assertThat(f.isDefinedAt(2)).isFalse();
     }
 
     // -- disabled super tests

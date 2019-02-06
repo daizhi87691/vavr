@@ -47,7 +47,6 @@ final class Collections {
         return iter1.hasNext() == iter2.hasNext();
     }
 
-    @GwtIncompatible
     static <T, C extends Seq<T>> C asJava(C source, Consumer<? super java.util.List<T>> action, ChangePolicy changePolicy) {
         Objects.requireNonNull(action, "action is null");
         final ListView<T, C> view = JavaConverters.asJava(source, changePolicy);
@@ -170,11 +169,32 @@ final class Collections {
         return tabulate(n, ignored -> supplier.get());
     }
 
+    static <T> Iterator<T> fillObject(int n, T element) {
+        if (n <= 0) {
+            return Iterator.empty();
+        } else {
+            return Iterator.continually(element).take(n);
+        }
+    }
+
     static <C extends Traversable<T>, T> C fill(int n, Supplier<? extends T> s, C empty, Function<T[], C> of) {
         Objects.requireNonNull(s, "s is null");
         Objects.requireNonNull(empty, "empty is null");
         Objects.requireNonNull(of, "of is null");
         return tabulate(n, anything -> s.get(), empty, of);
+    }
+
+    static <C extends Traversable<T>, T> C fillObject(int n, T element, C empty, Function<T[], C> of) {
+        Objects.requireNonNull(empty, "empty is null");
+        Objects.requireNonNull(of, "of is null");
+        if (n <= 0) {
+            return empty;
+        } else {
+            @SuppressWarnings("unchecked")
+            final T[] elements = (T[]) new Object[n];
+            Arrays.fill(elements, element);
+            return of.apply(elements);
+        }
     }
 
     static <T, C, R extends Iterable<T>> Map<C, R> groupBy(Traversable<T> source, Function<? super T, ? extends C> classifier, Function<? super Iterable<T>, R> mapper) {
@@ -225,8 +245,8 @@ final class Collections {
 
     // @param iterable may not be null
     static boolean isEmpty(Iterable<?> iterable) {
-        return iterable instanceof Traversable && ((Traversable) iterable).isEmpty()
-                || iterable instanceof Collection && ((Collection) iterable).isEmpty()
+        return iterable instanceof Traversable && ((Traversable<?>) iterable).isEmpty()
+                || iterable instanceof Collection && ((Collection<?>) iterable).isEmpty()
                 || !iterable.iterator().hasNext();
     }
 
@@ -499,7 +519,6 @@ final class Collections {
         return rowFactory.apply(Iterator.of(results).map(columnFactory));
     }
 
-    @SuppressWarnings("unchecked")
     static <T> IterableWithSize<T> withSize(Iterable<? extends T> iterable) {
         return isTraversableAgain(iterable) ? withSizeTraversable(iterable) : withSizeTraversable(List.ofAll(iterable));
     }
@@ -533,7 +552,6 @@ final class Collections {
             return size;
         }
 
-        @SuppressWarnings("unchecked")
         Object[] toArray() {
             if (iterable instanceof Collection<?>) {
                 return ((Collection<? extends T>) iterable).toArray();

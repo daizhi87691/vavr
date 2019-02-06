@@ -216,6 +216,25 @@ public interface Either<L, R> extends Value<R>, Serializable {
     }
 
     /**
+     * Maps the values of an iterable to a sequence of mapped values into a single {@code Either} by
+     * transforming an {@code Iterable<? extends T>} into a {@code Either<Seq<U>>}.
+     * <p>
+     *
+     * @param values   An {@code Iterable} of values.
+     * @param mapper   A mapper of values to Eithers
+     * @param <L>      The mapped left value type.
+     * @param <R>      The mapped right value type.
+     * @param <T>      The type of the given values.
+     * @return A {@code Either} of a {@link Seq} of results.
+     * @throws NullPointerException if values or f is null.
+     */
+    static <L, R, T> Either<Seq<L>, Seq<R>> traverse(Iterable<? extends T> values, Function<? super T, ? extends Either<? extends L, ? extends R>> mapper) {
+        Objects.requireNonNull(values, "values is null");
+        Objects.requireNonNull(mapper, "mapper is null");
+        return sequence(Iterator.ofAll(values).map(mapper));
+    }
+
+    /**
      * Reduces many {@code Either}s into a single {@code Either} by transforming an
      * {@code Iterable<Either<L, R>>} into a {@code Either<L, Seq<R>>}.
      * <p>
@@ -253,6 +272,25 @@ public interface Either<L, R> extends Value<R>, Serializable {
             }
         }
         return Either.right(rightValues);
+    }
+
+    /**
+     * Maps the values of an iterable to a sequence of mapped values into a single {@code Either} by
+     * transforming an {@code Iterable<? extends T>} into a {@code Either<Seq<U>>}.
+     * <p>
+     *
+     * @param values   An {@code Iterable} of values.
+     * @param mapper   A mapper of values to Eithers
+     * @param <L>      The mapped left value type.
+     * @param <R>      The mapped right value type.
+     * @param <T>      The type of the given values.
+     * @return A {@code Either} of a {@link Seq} of results.
+     * @throws NullPointerException if values or f is null.
+     */
+    static <L, R, T> Either<L, Seq<R>> traverseRight(Iterable<? extends T> values, Function<? super T, ? extends Either<? extends L, ? extends R>> mapper) {
+        Objects.requireNonNull(values, "values is null");
+        Objects.requireNonNull(mapper, "mapper is null");
+        return sequenceRight(Iterator.ofAll(values).map(mapper));
     }
 
     /**

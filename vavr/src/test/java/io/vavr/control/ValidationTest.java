@@ -27,6 +27,7 @@ import io.vavr.collection.Seq;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ValidationTest extends AbstractValueTest {
@@ -135,7 +136,6 @@ public class ValidationTest extends AbstractValueTest {
         assertThat(validation.getErrors()).isEqualTo(List.of(throwable));
     }
 
-
     // -- Validation.narrow
 
     @Test
@@ -177,6 +177,31 @@ public class ValidationTest extends AbstractValueTest {
                 Validation.invalid("error3", "error4")
         ));
         assertThat(actual).isEqualTo(Validation.invalid("error1", "error2", "error3", "error4"));
+    }
+
+    // -- Validation.traverse
+
+    @Test(expected = NullPointerException.class)
+    public void shouldThrowWhenTraversingNull() {
+        Validation.traverse(null, null);
+    }
+
+    @Test
+    public void shouldCreateValidWhenTraversingValids() {
+        final Validation<Seq<String>, Seq<Integer>> actual =
+            Validation.traverse(List.of(1, 2), Validation::valid);
+        assertThat(actual).isEqualTo(Validation.valid(List.of(1, 2)));
+    }
+
+    @Test
+    public void shouldCreateInvalidWhenTraversingAnInvalid() {
+        final Validation<String, Seq<Integer>> actual =
+            Validation.traverse(
+                List.of(1, -1, 2, -2),
+                x -> x >= 0
+                    ? Validation.valid(x)
+                    : Validation.invalid("error" + Integer.toString(x), "error" + Integer.toString(x+1)));
+        assertThat(actual).isEqualTo(Validation.invalid("error-1", "error0", "error-2", "error-1"));
     }
 
     // -- ap
@@ -651,7 +676,6 @@ public class ValidationTest extends AbstractValueTest {
         }
     }
 
-
     static class TestNestedPojo {
         Option<String> pojoName;
         TestPojo testPojo;
@@ -759,5 +783,38 @@ public class ValidationTest extends AbstractValueTest {
     @Test
     public void shouldReturnSizeWhenSpliterator() {
         assertThat(of(1).spliterator().getExactSizeIfKnown()).isEqualTo(1);
+    }
+
+    // -- peekInvalid
+
+    private Consumer<Seq<Integer>> withSideEffectOn(ArrayList<Integer> effect) {
+        return e -> e.forEach(effect::add);
+    }
+
+    @Test
+    public void shouldPeekInvalidNoEffectOnValid() {
+        final ArrayList<Integer> mutableList = new ArrayList<>();
+        final Validation<Integer, String> expected = Validation.valid("");
+        final Validation<Integer, String> actual = expected.peekInvalid(withSideEffectOn(mutableList));
+        assertThat(actual).isEqualTo(expected);
+        assertThat(mutableList).isEmpty();
+    }
+
+    @Test
+    public void shouldPeekInvalidEffectOnSingleInvalid() {
+        final ArrayList<Integer> mutableList = new ArrayList<>();
+        final Validation<Integer, String> expected = Validation.invalid(1);
+        final Validation<Integer, String> actual = expected.peekInvalid(withSideEffectOn(mutableList));
+        assertThat(actual).isEqualTo(expected);
+        assertThat(mutableList).containsExactly(1);
+    }
+
+    @Test
+    public void shouldPeekInvalidEffectOnMultipleInvalid() {
+        final ArrayList<Integer> mutableList = new ArrayList<>();
+        final Validation<Integer, String> expected = Validation.invalid(1, 2, 3);
+        final Validation<Integer, String> actual = expected.peekInvalid(withSideEffectOn(mutableList));
+        assertThat(actual).isEqualTo(expected);
+        assertThat(mutableList).containsExactly(1, 2, 3);
     }
 }

@@ -308,6 +308,18 @@ public final class Queue<T> extends AbstractQueue<T, Queue<T>> implements Linear
         return io.vavr.collection.Collections.fill(n, s, empty(), Queue::of);
     }
 
+    /**
+     * Returns a Queue containing {@code n} times the given {@code element}
+     *
+     * @param <T>     Component type of the Queue
+     * @param n       The number of elements in the Queue
+     * @param element The element
+     * @return An Queue of size {@code n}, where each element is the given {@code element}.
+     */
+    public static <T> Queue<T> fill(int n, T element) {
+        return io.vavr.collection.Collections.fillObject(n, element, empty(), Queue::of);
+    }
+
     public static Queue<Character> range(char from, char toExclusive) {
         return ofAll(Iterator.range(from, toExclusive));
     }
@@ -316,7 +328,6 @@ public final class Queue<T> extends AbstractQueue<T, Queue<T>> implements Linear
         return ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
 
-    @GwtIncompatible
     public static Queue<Double> rangeBy(double from, double toExclusive, double step) {
         return ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
@@ -421,7 +432,6 @@ public final class Queue<T> extends AbstractQueue<T, Queue<T>> implements Linear
         return ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
 
-    @GwtIncompatible
     public static Queue<Double> rangeClosedBy(double from, double toInclusive, double step) {
         return ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
@@ -662,25 +672,21 @@ public final class Queue<T> extends AbstractQueue<T, Queue<T>> implements Linear
         return enqueueAll(elements);
     }
 
-    @GwtIncompatible
     @Override
     public java.util.List<T> asJava() {
         return JavaConverters.asJava(this, IMMUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     public Queue<T> asJava(Consumer<? super java.util.List<T>> action) {
         return Collections.asJava(this, action, IMMUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     public java.util.List<T> asJavaMutable() {
         return JavaConverters.asJava(this, MUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     public Queue<T> asJavaMutable(Consumer<? super java.util.List<T>> action) {
         return Collections.asJava(this, action, MUTABLE);

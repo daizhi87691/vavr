@@ -207,6 +207,18 @@ public interface Tree<T> extends Traversable<T>, Serializable {
     }
 
     /**
+     * Returns a Tree containing {@code n} times the given {@code element}
+     *
+     * @param <T>     Component type of the Tree
+     * @param n       The number of elements in the Tree
+     * @param element The element
+     * @return A Tree of size {@code n}, where each element is the given {@code element}.
+     */
+    static <T> Tree<T> fill(int n, T element) {
+        return io.vavr.collection.Collections.fillObject(n, element, empty(), Tree::of);
+    }
+
+    /**
      * Recursively builds a non-empty {@code Tree}, starting with the given {@code seed} value and proceeding in depth-first order.
      * <p>
      * The children of a node are created by
@@ -971,7 +983,6 @@ public interface Tree<T> extends Traversable<T>, Serializable {
          *
          * @return A SerializationProxy for this enclosing class.
          */
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private Object writeReplace() {
             return new SerializationProxy<>(this);
         }
@@ -984,7 +995,6 @@ public interface Tree<T> extends Traversable<T>, Serializable {
          * @param stream An object serialization stream.
          * @throws java.io.InvalidObjectException This method will throw with the message "Proxy required".
          */
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private void readObject(ObjectInputStream stream) throws InvalidObjectException {
             throw new InvalidObjectException("Proxy required");
         }
@@ -997,7 +1007,6 @@ public interface Tree<T> extends Traversable<T>, Serializable {
          */
         // DEV NOTE: The serialization proxy pattern is not compatible with non-final, i.e. extendable,
         // classes. Also, it may not be compatible with circular object graphs.
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private static final class SerializationProxy<T> implements Serializable {
 
             private static final long serialVersionUID = 1L;

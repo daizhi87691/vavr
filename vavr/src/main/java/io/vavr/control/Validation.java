@@ -205,11 +205,11 @@ public interface Validation<E, T> extends Value<T>, Serializable {
      * or an invalid Validation containing an accumulated List of errors.
      * @throws NullPointerException if values is null
      */
-    static <E, T> Validation<E, Seq<T>> sequence(Iterable<? extends Validation<E, T>> values) {
+    static <E, T> Validation<E, Seq<T>> sequence(Iterable<? extends Validation<? extends E, ? extends T>> values) {
         Objects.requireNonNull(values, "values is null");
         List<E> errors = List.empty();
         List<T> list = List.empty();
-        for (Validation<E, T> value : values) {
+        for (Validation<? extends E, ? extends T> value : values) {
             if (value.isInvalid()) {
                 errors = errors.prependAll(value.getErrors().reverse());
             } else if (errors.isEmpty()) {
@@ -217,6 +217,25 @@ public interface Validation<E, T> extends Value<T>, Serializable {
             }
         }
         return errors.isEmpty() ? valid(list.reverse()) : invalidAll(errors.reverse());
+    }
+
+    /**
+     * Maps the values of an iterable to a sequence of mapped values into a single {@code Validation} by
+     * transforming an {@code Iterable<? extends T>} into a {@code Validation<Seq<U>>}.
+     * <p>
+     *
+     * @param values   An {@code Iterable} of values.
+     * @param mapper   A mapper of values to Validations
+     * @param <T>      The type of the given values.
+     * @param <E>      The mapped error value type.
+     * @param <U>      The mapped valid value type.
+     * @return A {@code Validation} of a {@link Seq} of results.
+     * @throws NullPointerException if values or f is null.
+     */
+    static <E, T, U> Validation<E, Seq<U>> traverse(Iterable<? extends T> values, Function<? super T, ? extends Validation<? extends E, ? extends U>> mapper) {
+        Objects.requireNonNull(values, "values is null");
+        Objects.requireNonNull(mapper, "mapper is null");
+        return sequence(Iterator.ofAll(values).map(mapper));
     }
 
     /**
@@ -735,6 +754,19 @@ public interface Validation<E, T> extends Value<T>, Serializable {
     default Validation<E, T> peek(Consumer<? super T> action) {
         if (isValid()) {
             action.accept(get());
+        }
+        return this;
+    }
+
+    /**
+     * Consumes the errors if this is an Invalid.
+     *
+     * @param action The action that will be performed on the errors.
+     * @return this instance
+     */
+    default Validation<E, T> peekInvalid(Consumer<? super Seq<E>> action) {
+        if (isInvalid()) {
+            action.accept(getErrors());
         }
         return this;
     }

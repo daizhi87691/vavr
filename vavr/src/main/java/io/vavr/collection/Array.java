@@ -273,6 +273,18 @@ public final class Array<T> implements IndexedSeq<T>, Serializable {
         return io.vavr.collection.Collections.fill(n, s, empty(), Array::of);
     }
 
+    /**
+     * Returns an Array containing {@code n} times the given {@code element}
+     *
+     * @param <T>     Component type of the Array
+     * @param n       The number of elements in the Array
+     * @param element The element
+     * @return An Array of size {@code n}, where each element is the given {@code element}.
+     */
+    public static <T> Array<T> fill(int n, T element) {
+        return io.vavr.collection.Collections.fillObject(n, element, empty(), Array::of);
+    }
+
     public static Array<Character> range(char from, char toExclusive) {
         return ofAll(Iterator.range(from, toExclusive));
     }
@@ -281,7 +293,6 @@ public final class Array<T> implements IndexedSeq<T>, Serializable {
         return ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
 
-    @GwtIncompatible
     public static Array<Double> rangeBy(double from, double toExclusive, double step) {
         return ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
@@ -386,7 +397,6 @@ public final class Array<T> implements IndexedSeq<T>, Serializable {
         return ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
 
-    @GwtIncompatible
     public static Array<Double> rangeClosedBy(double from, double toInclusive, double step) {
         return ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
@@ -609,25 +619,21 @@ public final class Array<T> implements IndexedSeq<T>, Serializable {
         }
     }
 
-    @GwtIncompatible
     @Override
     public java.util.List<T> asJava() {
         return JavaConverters.asJava(this, IMMUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     public Array<T> asJava(Consumer<? super java.util.List<T>> action) {
         return Collections.asJava(this, action, IMMUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     public java.util.List<T> asJavaMutable() {
         return JavaConverters.asJava(this, MUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     public Array<T> asJavaMutable(Consumer<? super java.util.List<T>> action) {
         return Collections.asJava(this, action, MUTABLE);

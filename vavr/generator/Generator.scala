@@ -530,6 +530,7 @@ def generateMainClasses(): Unit = {
            * @param supplier A checked supplier
            * @return {@link $TryType.Success} if no exception occurs, otherwise {@link $TryType.Failure} if an
            * exception occurs calling {@code supplier.get()}.
+           * @throws Error if the result is a {@link $TryType.Failure} and the underlying cause is fatal, i.e. non-recoverable
            */
           public static <T> $TryType<T> Try($CheckedFunction0Type<? extends T> supplier) {
               return $TryType.of(supplier);
@@ -553,6 +554,7 @@ def generateMainClasses(): Unit = {
            * @param <T>       Component type of the {@code Try}.
            * @param exception An exception.
            * @return A new {@link $TryType.Failure}.
+           * @throws Error if the given {@code exception} is fatal, i.e. non-recoverable
            */
           @SuppressWarnings("unchecked")
           public static <T> $TryType.Failure<T> Failure(Throwable exception) {
@@ -793,7 +795,6 @@ def generateMainClasses(): Unit = {
            * @param <T> type of the value
            * @return a new {@code Match} instance
            */
-          @GwtIncompatible
           public static <T> Match<T> Match(T value) {
               return new Match<>(value);
           }
@@ -802,21 +803,18 @@ def generateMainClasses(): Unit = {
 
           // - Pattern0
 
-          @GwtIncompatible
           public static <T, R> Case<T, R> Case(Pattern0<T> pattern, $FunctionType<? super T, ? extends R> f) {
               $Objects.requireNonNull(pattern, "pattern is null");
               $Objects.requireNonNull(f, "f is null");
               return new Case0<>(pattern, f);
           }
 
-          @GwtIncompatible
           public static <T, R> Case<T, R> Case(Pattern0<T> pattern, $SupplierType<? extends R> supplier) {
               $Objects.requireNonNull(pattern, "pattern is null");
               $Objects.requireNonNull(supplier, "supplier is null");
               return new Case0<>(pattern, ignored -> supplier.get());
           }
 
-          @GwtIncompatible
           public static <T, R> Case<T, R> Case(Pattern0<T> pattern, R retVal) {
               $Objects.requireNonNull(pattern, "pattern is null");
               return new Case0<>(pattern, ignored -> retVal);
@@ -834,21 +832,18 @@ def generateMainClasses(): Unit = {
             xs"""
               // - Pattern$i
 
-              @GwtIncompatible
               public static <T, $generics, R> Case<T, R> Case(Pattern$i<T, $generics> pattern, $functionType<$argTypes, ? extends R> f) {
                   $Objects.requireNonNull(pattern, "pattern is null");
                   $Objects.requireNonNull(f, "f is null");
                   return new Case$i<>(pattern, f);
               }
 
-              @GwtIncompatible
               public static <T, $generics, R> Case<T, R> Case(Pattern$i<T, $generics> pattern, $SupplierType<? extends R> supplier) {
                   $Objects.requireNonNull(pattern, "pattern is null");
                   $Objects.requireNonNull(supplier, "supplier is null");
                   return new Case$i<>(pattern, $params -> supplier.get());
               }
 
-              @GwtIncompatible
               public static <T, $generics, R> Case<T, R> Case(Pattern$i<T, $generics> pattern, R retVal) {
                   $Objects.requireNonNull(pattern, "pattern is null");
                   return new Case$i<>(pattern, $params -> retVal);
@@ -866,7 +861,6 @@ def generateMainClasses(): Unit = {
            * @param <T> injected type of the underlying value
            * @return a new {@code Pattern0} instance
            */
-          @GwtIncompatible
           public static <T> Pattern0<T> $$() {
               return Pattern0.any();
           }
@@ -878,7 +872,6 @@ def generateMainClasses(): Unit = {
            * @param prototype the value that should be equal to the underlying object
            * @return a new {@code Pattern0} instance
            */
-          @GwtIncompatible
           public static <T> Pattern0<T> $$(T prototype) {
               return new Pattern0<T>() {
 
@@ -952,7 +945,6 @@ def generateMainClasses(): Unit = {
            * @param predicate the predicate that tests a given value
            * @return a new {@code Pattern0} instance
            */
-          @GwtIncompatible
           public static <T> Pattern0<T> $$($PredicateType<? super T> predicate) {
               $Objects.requireNonNull(predicate, "predicate is null");
               return new Pattern0<T>() {
@@ -975,7 +967,6 @@ def generateMainClasses(): Unit = {
            * Scala-like structural pattern matching for Java. Instances are obtained via {@link API#Match(Object)}.
            * @param <T> type of the object that is matched
            */
-          @GwtIncompatible
           public static final class Match<T> {
 
               private final T value;
@@ -1259,7 +1250,6 @@ def generateMainClasses(): Unit = {
            * @param format A format string as described in {@link $FormatterType}.
            * @param args   Arguments referenced by the format specifiers
            */
-          @GwtIncompatible
           public static void printf(String format, Object... args) {
               System.out.printf(format, args);
           }
@@ -1443,19 +1433,6 @@ def generateMainClasses(): Unit = {
                * The <a href="https://docs.oracle.com/javase/8/docs/api/index.html">serial version uid</a>.
                */
               long serialVersionUID = 1L;
-
-              /$javadoc
-               * Returns a function that always returns the constant
-               * value that you give in parameter.
-               *
-               ${(1 to i).gen(j => s"* @param <T$j> generic parameter type $j of the resulting function")("\n")}
-               * @param <R> the result type
-               * @param value the value to be returned
-               * @return a function always returning the given value
-               */
-              static $fullGenerics $className$fullGenerics constant(R value) {
-                  return ($params) -> value;
-              }
 
               /$javadoc
                * Creates a {@code $className} based on
@@ -1784,7 +1761,6 @@ def generateMainClasses(): Unit = {
       val Objects = im.getType("java.util.Objects")
       val Seq = im.getType("io.vavr.collection.Seq")
       val List = im.getType("io.vavr.collection.List")
-      val Iterator = im.getType("io.vavr.collection.Iterator")
       if(i==2){
         im.getType("java.util.Map")
         im.getType("java.util.AbstractMap")
@@ -2011,25 +1987,31 @@ def generateMainClasses(): Unit = {
                 """}
             }
 
-            ${(i == 0).gen(xs"""
-              public <T1> Tuple1<T1> concat(T1 t1) {
-                  return ${im.getType("io.vavr.Tuple")}.of(t1);
-              }
-            """)}
-
-            ${(i > 0 && i < N).gen(xs"""
-              public <T${i+1}> Tuple${i+1}<${(1 to i+1).gen(j => s"T$j")(", ")}> concat(T${i+1} t${i+1}) {
-                  return ${im.getType("io.vavr.Tuple")}.of(${(1 to i).gen(k => s"_$k")(", ")}, t${i+1});
-              }
-            """)}
-
-            ${(i > 0 && i < N) gen (1 to N-i).gen(j => xs"""
+            ${(i < N).gen(xs"""
               /$javadoc
-               * i=$i
-               * j=$j
+               * Append a value to this tuple.
+               *
+               * @param <T${i+1}> type of the value to append
+               * @param t${i+1} the value to append
+               * @return a new Tuple with the value appended
+               */
+              public <T${i+1}> Tuple${i+1}<${(1 to i+1).gen(j => s"T$j")(", ")}> append(T${i+1} t${i+1}) {
+                  return ${im.getType("io.vavr.Tuple")}.of(${(1 to i).gen(k => s"_$k")(", ")}${(i > 0).gen(", ")}t${i+1});
+              }
+            """)}
+
+            ${(i < N) gen (1 to N-i).gen(j => xs"""
+              /$javadoc
+               * Concat a tuple's values to this tuple.
+               *
+               ${(i+1 to i+j).gen(k => s"* @param <T$k> the type of the ${k.ordinal} value in the tuple")("\n")}
+               * @param tuple the tuple to concat
+               * @return a new Tuple with the tuple values appended
+               * @throws NullPointerException if {@code tuple} is null
                */
               public <${(i+1 to i+j).gen(k => s"T$k")(", ")}> Tuple${i+j}<${(1 to i+j).gen(k => s"T$k")(", ")}> concat(Tuple$j<${(i+1 to i+j).gen(k => s"T$k")(", ")}> tuple) {
-                  return ${im.getType("io.vavr.Tuple")}.of(${(1 to i).gen(k => s"_$k")(", ")}, ${(1 to j).gen(k => s"tuple._$k")(", ")});
+                  Objects.requireNonNull(tuple, "tuple is null");
+                  return ${im.getType("io.vavr.Tuple")}.of(${(1 to i).gen(k => s"_$k")(", ")}${(i > 0).gen(", ")}${(1 to j).gen(k => s"tuple._$k")(", ")});
               }
             """)("\n\n")}
 
@@ -2514,7 +2496,7 @@ def generateTestClasses(): Unit = {
               @$test
               public void shouldCreate${func}From${i}Pairs() {
                 $MapType<Integer, Integer> map = $func(${(1 to i).gen(j => s"$j, ${j*2}")(", ")});
-                ${(1 to i).gen(j => s"assertThat(map.apply($j)).isEqualTo(${j*2});")("\n")}
+                ${(1 to i).gen(j => s"assertThat(map.get($j).get()).isEqualTo(${j*2});")("\n")}
               }
             """
           })("\n\n")}
@@ -2909,12 +2891,6 @@ def generateTestClasses(): Unit = {
               public void shouldGetArity() {
                   final $name$i<$generics> f = ($functionArgs) -> null;
                   $assertThat(f.arity()).isEqualTo($i);
-              }
-
-              @$test
-              public void shouldConstant()${checked.gen(" throws Throwable")} {
-                  final $name$i<$generics> f = $name$i.constant(6);
-                  $assertThat(f.apply(${(1 to i).gen(j => s"$j")(", ")})).isEqualTo(6);
               }
 
               @$test
@@ -3417,6 +3393,24 @@ def generateTestClasses(): Unit = {
                   final Tuple0 actual = tuple.apply($functionArgs -> Tuple0.instance());
                   assertThat(actual).isEqualTo(Tuple0.instance());
               }
+
+              ${(i < N).gen(xs"""
+                @$test
+                public void shouldAppendValue() {
+                    final Tuple${i+1}<${(1 to i+1).gen(j => s"Integer")(", ")}> actual = ${ if (i == 0) "Tuple0.instance()" else s"Tuple.of(${(1 to i).gen(j => xs"$j")(", ")})"}.append(${i+1});
+                    final Tuple${i+1}<${(1 to i+1).gen(j => s"Integer")(", ")}> expected = Tuple.of(${(1 to i+1).gen(j => xs"$j")(", ")});
+                    assertThat(actual).isEqualTo(expected);
+                }
+              """)}
+
+              ${(i < N) gen (1 to N-i).gen(j => xs"""
+                @$test
+                public void shouldConcatTuple$j() {
+                    final Tuple${i+j}<${(1 to i+j).gen(j => s"Integer")(", ")}> actual = ${ if (i == 0) "Tuple0.instance()" else s"Tuple.of(${(1 to i).gen(j => xs"$j")(", ")})"}.concat(Tuple.of(${(i+1 to i+j).gen(k => s"$k")(", ")}));
+                    final Tuple${i+j}<${(1 to i+j).gen(j => s"Integer")(", ")}> expected = Tuple.of(${(1 to i+j).gen(j => xs"$j")(", ")});
+                    assertThat(actual).isEqualTo(expected);
+                }
+              """)("\n\n")}
 
               @$test
               public void shouldRecognizeEquality() {

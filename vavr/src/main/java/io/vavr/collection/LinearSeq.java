@@ -62,13 +62,27 @@ public interface LinearSeq<T> extends Seq<T> {
     @Override
     LinearSeq<T> appendAll(Iterable<? extends T> elements);
 
-    @GwtIncompatible
     @Override
     LinearSeq<T> asJava(Consumer<? super java.util.List<T>> action);
 
-    @GwtIncompatible
     @Override
     LinearSeq<T> asJavaMutable(Consumer<? super java.util.List<T>> action);
+
+    @Override
+    default PartialFunction<Integer, T> asPartialFunction() throws IndexOutOfBoundsException {
+        return new PartialFunction<Integer, T>() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public T apply(Integer index) {
+                return get(index);
+            }
+            @Override
+            public boolean isDefinedAt(Integer index) {
+                // we can't use length() because of infinite long sequences
+                return 0 <= index && drop(index).nonEmpty();
+            }
+        };
+    }
 
     @Override
     <R> LinearSeq<R> collect(PartialFunction<? super T, ? extends R> partialFunction);
@@ -159,12 +173,6 @@ public interface LinearSeq<T> extends Seq<T> {
 
     @Override
     LinearSeq<T> intersperse(T element);
-
-    @Override
-    default boolean isDefinedAt(Integer index) {
-        // we can't use length() because of infinite long sequences
-        return 0 <= index && drop(index).nonEmpty();
-    }
 
     @Override
     default int lastIndexOfSlice(Iterable<? extends T> that, int end) {

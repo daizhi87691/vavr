@@ -63,13 +63,26 @@ public interface IndexedSeq<T> extends Seq<T> {
     @Override
     IndexedSeq<T> appendAll(Iterable<? extends T> elements);
 
-    @GwtIncompatible
     @Override
     IndexedSeq<T> asJava(Consumer<? super java.util.List<T>> action);
 
-    @GwtIncompatible
     @Override
     IndexedSeq<T> asJavaMutable(Consumer<? super java.util.List<T>> action);
+
+    @Override
+    default PartialFunction<Integer, T> asPartialFunction() throws IndexOutOfBoundsException {
+        return new PartialFunction<Integer, T>() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public T apply(Integer index) {
+                return get(index);
+            }
+            @Override
+            public boolean isDefinedAt(Integer index) {
+                return 0 <= index && index < length();
+            }
+        };
+    }
 
     @Override
     <R> IndexedSeq<R> collect(PartialFunction<? super T, ? extends R> partialFunction);
@@ -176,11 +189,6 @@ public interface IndexedSeq<T> extends Seq<T> {
 
     @Override
     IndexedSeq<T> intersperse(T element);
-
-    @Override
-    default boolean isDefinedAt(Integer index) {
-        return 0 <= index && index < length();
-    }
 
     @Override
     default T last() {

@@ -2184,11 +2184,11 @@ public class CharSeqTest {
         assertThatThrownBy(() -> CharSeq.empty().appendAll(Arrays.asList('1', null))).isInstanceOf(NullPointerException.class);
     }
 
-    // -- apply
+    // -- asPartialFunction
 
     @Test
     public void shouldUseSeqAsPartialFunction() {
-        assertThat(CharSeq.of('1', '2', '3').apply(1)).isEqualTo('2');
+        assertThat(CharSeq.of('1', '2', '3').asPartialFunction().apply(1)).isEqualTo('2');
     }
 
     // -- combinations
@@ -3655,7 +3655,7 @@ public class CharSeqTest {
 
     @Test
     public void shouldUnfoldRightSimpleCharSeq() {
-        assertThat(
+        this.<CharSeq> assertThat(
                 CharSeq.unfoldRight('j', x -> x == 'a'
                                               ? Option.none()
                                               : Option.of(new Tuple2<>(x, (char) (x - 1)))))
@@ -3669,7 +3669,7 @@ public class CharSeqTest {
 
     @Test
     public void shouldUnfoldLeftSimpleCharSeq() {
-        assertThat(
+        this.<CharSeq> assertThat(
                 CharSeq.unfoldLeft('j', x -> x == 'a'
                                              ? Option.none()
                                              : Option.of(new Tuple2<>((char) (x - 1), x))))

@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -158,6 +159,8 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
 
     @SuppressWarnings("unchecked")
     protected abstract <K extends Comparable<? super K>, V> Map<K, V> mapOfTuples(Tuple2<? extends K, ? extends V>... entries);
+
+    protected abstract <K extends Comparable<? super K>, V> Map<K, V> mapOfTuples(Iterable<? extends Tuple2<? extends K, ? extends V>> entries);
 
     @SuppressWarnings("unchecked")
     protected abstract <K extends Comparable<? super K>, V> Map<K, V> mapOfEntries(java.util.Map.Entry<? extends K, ? extends V>... entries);
@@ -330,10 +333,29 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
     }
 
     @Test
+    public void shouldConstructFromJavaStreamWithDuplicatedKeys() {
+        assertThat(mapOf(Stream.range(0, 4).toJavaStream()
+                , i -> Math.max(1, Math.min(i, 2))
+                , i -> String.valueOf(i + 1)
+        ))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
+    }
+
+    @Test
     public void shouldConstructFromJavaStreamEntries() {
         final java.util.stream.Stream<Integer> javaStream = java.util.stream.Stream.of(1, 2, 3);
         final Map<String, Integer> map = mapOf(javaStream, i -> Tuple.of(String.valueOf(i), i));
         assertThat(map).isEqualTo(this.<String, Integer> emptyMap().put("1", 1).put("2", 2).put("3", 3));
+    }
+
+    @Test
+    public void shouldConstructFromJavaStreamEntriesWithDuplicatedKeys() {
+        assertThat(mapOf(Stream.range(0, 4).toJavaStream(), i ->
+                Map.entry(Math.max(1, Math.min(i, 2)), String.valueOf(i + 1))
+        ))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
     }
 
     @Test
@@ -346,10 +368,49 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void shouldConstructFromEntries() {
+    public void shouldConstructFromUtilEntriesWithDuplicatedKeys() {
+        assertThat(mapOfEntries(
+                asJavaEntry(1, "1"), asJavaEntry(1, "2"),
+                asJavaEntry(2, "3"), asJavaEntry(2, "4")
+        ))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldConstructFromEntriesVararg() {
         final Map<String, Integer> actual = mapOfTuples(Map.entry("1", 1), Map.entry("2", 2), Map.entry("3", 3));
         final Map<String, Integer> expected = this.<String, Integer>emptyMap().put("1", 1).put("2", 2).put("3", 3);
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldConstructFromEntriesVarargWithDuplicatedKeys() {
+        assertThat(mapOfTuples(
+                Map.entry(1, "1"), Map.entry(1, "2"),
+                Map.entry(2, "3"), Map.entry(2, "4")
+        ))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
+    }
+
+    @Test
+    public void shouldConstructFromEntriesIterable() {
+        final Map<String, Integer> actual = mapOfTuples(asList(Map.entry("1", 1), Map.entry("2", 2), Map.entry("3", 3)));
+        final Map<String, Integer> expected = this.<String, Integer>emptyMap().put("1", 1).put("2", 2).put("3", 3);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldConstructFromEntriesIterableWithDuplicatedKeys() {
+        assertThat(mapOfTuples(asList(
+                Map.entry(1, "1"), Map.entry(1, "2"),
+                Map.entry(2, "3"), Map.entry(2, "4")
+        )))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
     }
 
     @Test
@@ -359,14 +420,65 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
         assertThat(actual).isEqualTo(expected);
     }
 
-    // -- PartialFunction
+    @Test
+    public void shouldConstructFromPairsWithDuplicatedKeys() {
+        final Map<Integer, String> actual = mapOf(1, "1", 1, "2", 2, "3");
+        final Map<Integer, String> expected = this.<Integer, String>emptyMap().put(1, "2").put(2, "3");
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldConstructWithTabulate() {
+        final Map<String, Integer> actual = mapTabulate(4, i -> Tuple.of(i.toString(), i));
+        final Map<String, Integer> expected = this.<String, Integer>emptyMap().put("0", 0).put("1", 1).put("2", 2).put("3", 3);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldConstructWithTabulateWithDuplicatedKeys() {
+        assertThat(mapTabulate(4, i ->
+                Tuple.of(Math.max(1, Math.min(i, 2)), String.valueOf(i + 1))
+        ))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
+    }
+
+    @Test
+    public void shouldConstructWithFill() {
+        AtomicInteger i = new AtomicInteger();
+        final Map<String, Integer> actual = mapFill(4, () -> Tuple.of(String.valueOf(i.get()), i.getAndIncrement()));
+        final Map<String, Integer> expected = this.<String, Integer>emptyMap().put("0", 0).put("1", 1).put("2", 2).put("3", 3);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldConstructWithFillWithDuplicatedKeys() {
+        AtomicInteger i = new AtomicInteger();
+        assertThat(mapFill(4, () ->
+                Tuple.of(Math.max(1, Math.min(i.get(), 2)), String.valueOf(i.getAndIncrement() + 1))
+        ))
+                .hasSize(2)
+                .isEqualTo(mapOf(1, "2", 2, "4"));
+    }
+
+    // -- asPartialFunction
 
     @Test
     public void shouldImplementPartialFunction() {
-        PartialFunction<Integer, String> f = mapOf(1, "1");
+        PartialFunction<Integer, String> f = mapOf(1, "1").asPartialFunction();
         assertThat(f.isDefinedAt(1)).isTrue();
         assertThat(f.apply(1)).isEqualTo("1");
         assertThat(f.isDefinedAt(2)).isFalse();
+    }
+
+    @Test
+    public void shouldApplyExistingKey() {
+        assertThat(emptyInt().put(1, 2).asPartialFunction().apply(1)).isEqualTo(2);
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void shouldApplyNonExistingKey() {
+        emptyInt().put(1, 2).asPartialFunction().apply(3);
     }
 
     // -- equality
@@ -428,18 +540,6 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
         final Map<Integer, String> actual = mapOf(1, "1", 2, "2", 3, "3");
         final java.util.Map<Integer, String> expected = asJavaMap(asJavaEntry(1, "1"), asJavaEntry(2, "2"), asJavaEntry(3, "3"));
         assertThat(actual.toJavaMap()).isEqualTo(expected);
-    }
-
-    // -- apply
-
-    @Test
-    public void shouldApplyExistingKey() {
-        assertThat(emptyInt().put(1, 2).apply(1)).isEqualTo(2);
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    public void shouldApplyNonExistingKey() {
-        emptyInt().put(1, 2).apply(3);
     }
 
     // -- contains
@@ -1097,6 +1197,8 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
         assertThat(mapTabulate(-1, i -> new Tuple2<>(i, i))).isEqualTo(empty());
     }
 
+    // -- fill(int, Supplier)
+
     @SuppressWarnings("unchecked")
     @Test
     public void shouldFillTheSeqCallingTheSupplierInTheRightOrder() {
@@ -1109,6 +1211,14 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
     @Test
     public void shouldFillTheSeqWith0Elements() {
         assertThat(mapFill(0, () -> new Tuple2<>(1, 1))).isEqualTo(empty());
+    }
+
+    @Test
+    public void shouldReturnSingleMapAfterFillWithConstantKeys() {
+        AtomicInteger value = new AtomicInteger(83);
+        assertThat(mapFill(17, () -> Tuple.of(7, value.getAndIncrement())))
+                .hasSize(1)
+                .isEqualTo(mapOf(7, value.decrementAndGet()));
     }
 
     @Test
@@ -1135,20 +1245,6 @@ public abstract class AbstractMapTest extends AbstractTraversableTest {
         final Function1<String, Option<Integer>> lifted = mapOf("A", 1).lift();
         assertThat(lifted.apply("A").get()).isEqualTo(1);
         assertThat(lifted.apply("a").isEmpty()).isTrue();
-    }
-
-    @Test
-    public void withDefaultValue() {
-        final Function1<String, Integer> withDef = mapOf("A", 1).withDefaultValue(2);
-        assertThat(withDef.apply("A")).isEqualTo(1);
-        assertThat(withDef.apply("a")).isEqualTo(2);
-    }
-
-    @Test
-    public void withDefault() {
-        final Function1<String, Integer> withDef = mapOf("A", 1).withDefault(String::length);
-        assertThat(withDef.apply("A")).isEqualTo(1);
-        assertThat(withDef.apply("aaa")).isEqualTo(3);
     }
 
     // -- filter

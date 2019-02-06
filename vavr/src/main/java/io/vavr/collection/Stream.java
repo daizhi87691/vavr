@@ -361,6 +361,18 @@ public interface Stream<T> extends LinearSeq<T> {
     }
 
     /**
+     * Returns a Stream containing {@code n} times the given {@code element}
+     *
+     * @param <T>     Component type of the Stream
+     * @param n       The number of elements in the Stream
+     * @param element The element
+     * @return A Stream of size {@code n}, where each element is the given {@code element}.
+     */
+    static <T> Stream<T> fill(int n, T element) {
+        return Stream.ofAll(io.vavr.collection.Collections.fillObject(n, element));
+    }
+
+    /**
      * Creates a Stream of the given elements.
      *
      * @param <T>      Component type of the Stream.
@@ -493,7 +505,6 @@ public interface Stream<T> extends LinearSeq<T> {
         return Stream.ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
 
-    @GwtIncompatible
     static Stream<Double> rangeBy(double from, double toExclusive, double step) {
         return Stream.ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
@@ -598,7 +609,6 @@ public interface Stream<T> extends LinearSeq<T> {
         return Stream.ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
 
-    @GwtIncompatible
     static Stream<Double> rangeClosedBy(double from, double toInclusive, double step) {
         return Stream.ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
@@ -851,25 +861,21 @@ public interface Stream<T> extends LinearSeq<T> {
         return isEmpty() ? this : new AppendSelf<>((Cons<T>) this, mapper).stream();
     }
 
-    @GwtIncompatible
     @Override
     default java.util.List<T> asJava() {
         return JavaConverters.asJava(this, IMMUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     default Stream<T> asJava(Consumer<? super java.util.List<T>> action) {
         return Collections.asJava(this, action, IMMUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     default java.util.List<T> asJavaMutable() {
         return JavaConverters.asJava(this, MUTABLE);
     }
 
-    @GwtIncompatible
     @Override
     default Stream<T> asJavaMutable(Consumer<? super java.util.List<T>> action) {
         return Collections.asJava(this, action, MUTABLE);
@@ -1049,25 +1055,7 @@ public interface Stream<T> extends LinearSeq<T> {
     @Override
     default <U> Stream<U> flatMap(Function<? super T, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper, "mapper is null");
-        return isEmpty() ? Empty.instance() : Stream.ofAll(new Iterator<U>() {
-
-            final Iterator<? extends T> inputs = Stream.this.iterator();
-            java.util.Iterator<? extends U> current = java.util.Collections.emptyIterator();
-
-            @Override
-            public boolean hasNext() {
-                boolean currentHasNext;
-                while (!(currentHasNext = current.hasNext()) && inputs.hasNext()) {
-                    current = mapper.apply(inputs.next()).iterator();
-                }
-                return currentHasNext;
-            }
-
-            @Override
-            public U next() {
-                return current.next();
-            }
-        });
+        return isEmpty() ? Empty.instance() : Stream.ofAll(new FlatMapIterator<>(this.iterator(), mapper));
     }
 
     @Override
@@ -1930,12 +1918,10 @@ interface StreamModule {
             return tail.get();
         }
 
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private Object writeReplace() {
             return new SerializationProxy<>(this);
         }
 
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private void readObject(ObjectInputStream stream) throws InvalidObjectException {
             throw new InvalidObjectException("Proxy required");
         }
@@ -1979,12 +1965,10 @@ interface StreamModule {
             }
         }
 
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private Object writeReplace() {
             return new SerializationProxy<>(this);
         }
 
-        @GwtIncompatible("The Java serialization protocol is explicitly not supported")
         private void readObject(ObjectInputStream stream) throws InvalidObjectException {
             throw new InvalidObjectException("Proxy required");
         }
@@ -1998,7 +1982,6 @@ interface StreamModule {
      */
     // DEV NOTE: The serialization proxy pattern is not compatible with non-final, i.e. extendable,
     // classes. Also, it may not be compatible with circular object graphs.
-    @GwtIncompatible("The Java serialization protocol is explicitly not supported")
     final class SerializationProxy<T> implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -2144,6 +2127,32 @@ interface StreamModule {
             // DEV-NOTE: we make the stream even more lazy because the next head must not be evaluated on hasNext()
             current = stream::tail;
             return stream.head();
+        }
+    }
+
+    final class FlatMapIterator<T, U> implements Iterator<U> {
+
+        final Function<? super T, ? extends Iterable<? extends U>> mapper;
+        final Iterator<? extends T> inputs;
+        java.util.Iterator<? extends U> current = java.util.Collections.emptyIterator();
+
+        FlatMapIterator(Iterator<? extends T> inputs, Function<? super T, ? extends Iterable<? extends U>> mapper) {
+            this.inputs = inputs;
+            this.mapper = mapper;
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean currentHasNext;
+            while (!(currentHasNext = current.hasNext()) && inputs.hasNext()) {
+                current = mapper.apply(inputs.next()).iterator();
+            }
+            return currentHasNext;
+        }
+
+        @Override
+        public U next() {
+            return current.next();
         }
     }
 }

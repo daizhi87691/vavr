@@ -123,6 +123,11 @@ public class StreamTest extends AbstractLinearSeqTest {
     }
 
     @Override
+    protected <T> Traversable<T> fill(int n, T element) {
+        return Stream.fill(n, element);
+    }
+
+    @Override
     protected Stream<Character> range(char from, char toExclusive) {
         return Stream.range(from, toExclusive);
     }
@@ -604,7 +609,7 @@ public class StreamTest extends AbstractLinearSeqTest {
 
     @Test
     public void shouldBeDefinedAtNonNegativeIndexWhenInfinitelyLong() {
-        assertThat(Stream.continually(1).isDefinedAt(1)).isTrue();
+        assertThat(Stream.continually(1).asPartialFunction().isDefinedAt(1)).isTrue();
     }
 
     // -- isLazy
@@ -691,6 +696,18 @@ public class StreamTest extends AbstractLinearSeqTest {
             }
         };
         assertThat(Stream.from(0).filter(hiddenThrow).take(1).sum().intValue()).isEqualTo(0);
+    }
+
+    @Ignore
+    @Test
+    public void shouldTakeZeroOfEmptyFilteredInfiniteStream() {
+        assertThat(Stream.continually(1).filter(i -> false).take(0).isEmpty()).isTrue();
+    }
+
+    @Ignore
+    @Test
+    public void shouldTakeZeroOfEmptyFlatMappedInfiniteStream() {
+        assertThat(Stream.continually(1).flatMap(i -> Stream.empty()).take(0).isEmpty()).isTrue();
     }
 
     @Ignore

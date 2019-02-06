@@ -162,7 +162,7 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
     }
 
     /**
-     * Returns a TreeSet containing {@code n} values supplied by a given Supplier {@code s}.
+     * Returns a TreeSet containing tuples returned by {@code n} calls to a given Supplier {@code s}.
      *
      * @param <T>        Component type of the TreeSet
      * @param comparator The comparator used to sort the elements
@@ -178,7 +178,7 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
     }
 
     /**
-     * Returns a TreeSet containing {@code n} values supplied by a given Supplier {@code s}.
+     * Returns a TreeSet containing tuples returned by {@code n} calls to a given Supplier {@code s}.
      * The underlying comparator is the natural comparator of T.
      *
      * @param <T> Component type of the TreeSet
@@ -192,7 +192,6 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
         return fill(Comparators.naturalComparator(), n, s);
     }
 
-    @SuppressWarnings("unchecked")
     public static <T extends Comparable<? super T>> TreeSet<T> ofAll(Iterable<? extends T> values) {
         return ofAll(Comparators.naturalComparator(), values);
     }
@@ -201,10 +200,10 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
     public static <T> TreeSet<T> ofAll(Comparator<? super T> comparator, Iterable<? extends T> values) {
         Objects.requireNonNull(comparator, "comparator is null");
         Objects.requireNonNull(values, "values is null");
-        if (values instanceof TreeSet && ((TreeSet) values).comparator() == comparator) {
+        if (values instanceof TreeSet && ((TreeSet<?>) values).comparator() == comparator) {
             return (TreeSet<T>) values;
         } else {
-            return values.iterator().hasNext() ? new TreeSet<>(RedBlackTree.ofAll(comparator, values)) : (TreeSet<T>) empty();
+            return values.iterator().hasNext() ? new TreeSet<>(RedBlackTree.ofAll(comparator, values)) : empty(comparator);
         }
     }
 
@@ -368,7 +367,6 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
         return TreeSet.ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
 
-    @GwtIncompatible
     public static TreeSet<Double> rangeBy(double from, double toExclusive, double step) {
         return TreeSet.ofAll(Iterator.rangeBy(from, toExclusive, step));
     }
@@ -473,7 +471,6 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
         return TreeSet.ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
 
-    @GwtIncompatible
     public static TreeSet<Double> rangeClosedBy(double from, double toInclusive, double step) {
         return TreeSet.ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
