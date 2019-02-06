@@ -24,18 +24,17 @@ import javaslang.collection.Vector;
 import javaslang.control.Either;
 import javaslang.control.Option;
 import javaslang.control.Try;
+import javaslang.control.Validation;
 import org.assertj.core.api.*;
 import org.junit.Test;
 
 import java.util.*;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.Function;
 
 import static java.lang.Integer.bitCount;
 import static javaslang.Serializables.deserialize;
 import static javaslang.Serializables.serialize;
-import static org.junit.Assert.fail;
 
 public abstract class AbstractValueTest {
 
@@ -465,6 +464,7 @@ public abstract class AbstractValueTest {
         assertThat(actual).isEqualTo(set);
     }
 
+
     @Test
     public void shouldConvertToStack() {
         final Value<Integer> value = of(1, 2, 3);
@@ -485,90 +485,6 @@ public abstract class AbstractValueTest {
         } else {
             assertThat(stream).isEqualTo(Stream.of(1, 2, 3));
         }
-    }
-
-    @Test
-    public void shouldConvertEmptyToTree() {
-        final Value<Integer> value = empty();
-        final Tree<Integer> tree = value.toTree();
-        assertThat(tree).isEqualTo(Tree.empty());
-    }
-
-    @Test
-    public void shouldConvertNonEmptyToTree() {
-        final Value<Integer> value = of(1, 2, 3);
-        final Tree<Integer> tree = value.toTree();
-        if (value.isSingleValued()) {
-            assertThat(tree).isEqualTo(Tree.of(1));
-        } else {
-            assertThat(tree).isEqualTo(Tree.of(1, 2, 3));
-        }
-    }
-
-    @Test
-    public void shouldConvertEmptyToTreeUsingComparator() {
-        fail("not implemented");
-    }
-
-    @Test
-    public void shouldConvertNonEmptyToProperTreeUsingComparator() {
-        final String actual = List.of(
-                "/",
-                "  home",
-                "    daniel",
-                "  var")
-                .toTree(s -> CharSeq.of(s).indexWhere(c -> c != ' '))
-                .map(String::trim).draw();
-        final String expected = String.join("\n",
-                                            "/",
-                                            "├──home",
-                                            "│  └──daniel",
-                                            "└──var");
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    public void shouldConvertNonEmptyToTreeAddingRootUsingComparator() {
-        final String actual = List.of(
-                "<dependency>",
-                "  <groupId>io.javaslang</groupId>",
-                "  <artifactId>javaslang</artifactId>",
-                "  <version>BLEEDING-EDGE</version>",
-                "</dependency>")
-                .toTree(s -> CharSeq.of(s).indexWhere(c -> c != ' '))
-                .map(s -> (s == null) ? "" : s.trim())
-                .draw();
-        final String expected = String.join("\n",
-                                            "",
-                                            "├──<dependency>",
-                                            "│  ├──<groupId>io.javaslang</groupId>",
-                                            "│  ├──<artifactId>javaslang</artifactId>",
-                                            "│  └──<version>BLEEDING-EDGE</version>",
-                                            "└──</dependency>");
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    public void shouldConvertNonEmptyNonToExpandedTreeUsingComparator() {
-        final String actual = List.of(
-                "   a",
-                "  b",
-                "c",
-                "  d",
-                "    e")
-                .toTree(s -> CharSeq.of(s).indexWhere(c -> c != ' '))
-                .map(s -> (s == null) ? "" : s.trim())
-                .draw();
-        final String expected = String.join("\n",
-                                            "",
-                                            "├──",
-                                            "│  ├──",
-                                            "│  │  └──a",
-                                            "│  └──b",
-                                            "└──c",
-                                            "   └──d",
-                                            "      └──e");
-        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -830,6 +746,22 @@ public abstract class AbstractValueTest {
     }
 
     @Test
+    public void shouldConvertToJavaParallelStream() {
+        final Value<Integer> value = of(1, 2, 3);
+        final java.util.stream.Stream<Integer> s1 = value.toJavaParallelStream();
+        assertThat(s1.isParallel()).isTrue();
+        if (value.isSingleValued()) {
+            final java.util.stream.Stream<Integer> s2 = java.util.stream.Stream.of(1);
+            assertThat(List.ofAll(s1::iterator)).isEqualTo(List.ofAll(s2::iterator));
+        } else {
+            final java.util.stream.Stream<Integer> s2 = java.util.stream.Stream.of(1, 2, 3);
+            assertThat(List.ofAll(s1::iterator)).isEqualTo(List.ofAll(s2::iterator));
+        }
+    }
+    
+    // toLeft / toRight
+
+    @Test
     public void shouldConvertToEitherLeftFromValueSupplier() {
         Either<Integer, String> either = of(0).toLeft(() -> "fallback");
         assertThat(either.isLeft()).isTrue();
@@ -871,6 +803,52 @@ public abstract class AbstractValueTest {
         Either<String, Object> either2 = empty().toRight("fallback");
         assertThat(either2.isLeft()).isTrue();
         assertThat(either2.getLeft()).isEqualTo("fallback");
+    }
+
+    // toValid / toInvalid
+
+    @Test
+    public void shouldConvertToValidationInvalidFromValueSupplier() {
+        Validation<Integer, String> validation = of(0).toInvalid(() -> "fallback");
+        assertThat(validation.isInvalid()).isTrue();
+        assertThat(validation.getError()).isEqualTo(0);
+
+        Validation<Object, String> validation2 = empty().toInvalid(() -> "fallback");
+        assertThat(validation2.isValid()).isTrue();
+        assertThat(validation2.get()).isEqualTo("fallback");
+    }
+
+    @Test
+    public void shouldConvertToValidationInvalidFromValue() {
+        Validation<Integer, String> validation = of(0).toInvalid("fallback");
+        assertThat(validation.isInvalid()).isTrue();
+        assertThat(validation.getError()).isEqualTo(0);
+
+        Validation<Object, String> validation2 = empty().toInvalid("fallback");
+        assertThat(validation2.isValid()).isTrue();
+        assertThat(validation2.get()).isEqualTo("fallback");
+    }
+
+    @Test
+    public void shouldConvertToValidationRightFromValueSupplier() {
+        Validation<String, Integer> validation = of(0).toValid(() -> "fallback");
+        assertThat(validation.isValid()).isTrue();
+        assertThat(validation.get()).isEqualTo(0);
+
+        Validation<String, Object> validation2 = empty().toValid(() -> "fallback");
+        assertThat(validation2.isInvalid()).isTrue();
+        assertThat(validation2.getError()).isEqualTo("fallback");
+    }
+
+    @Test
+    public void shouldConvertToValidationValidFromValue() {
+        Validation<String, Integer> validation = of(0).toValid("fallback");
+        assertThat(validation.isValid()).isTrue();
+        assertThat(validation.get()).isEqualTo(0);
+
+        Validation<String, Object> validation2 = empty().toValid("fallback");
+        assertThat(validation2.isInvalid()).isTrue();
+        assertThat(validation2.getError()).isEqualTo("fallback");
     }
 
     // -- exists
