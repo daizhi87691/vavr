@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +111,9 @@ public interface LinearSeq<T> extends Seq<T> {
 
     @Override
     LinearSeq<T> filter(Predicate<? super T> predicate);
+
+    @Override
+    LinearSeq<T> reject(Predicate<? super T> predicate);
 
     @Override
     <U> LinearSeq<U> flatMap(Function<? super T, ? extends Iterable<? extends U>> mapper);
@@ -234,6 +237,7 @@ public interface LinearSeq<T> extends Seq<T> {
     LinearSeq<T> removeAll(Iterable<? extends T> elements);
 
     @Override
+    @Deprecated
     LinearSeq<T> removeAll(Predicate<? super T> predicate);
 
     @Override
@@ -252,6 +256,12 @@ public interface LinearSeq<T> extends Seq<T> {
     default Iterator<T> reverseIterator() {
         return reverse().iterator();
     }
+
+    @Override
+    LinearSeq<T> rotateLeft(int n);
+
+    @Override
+    LinearSeq<T> rotateRight(int n);
 
     @Override
     LinearSeq<T> shuffle();

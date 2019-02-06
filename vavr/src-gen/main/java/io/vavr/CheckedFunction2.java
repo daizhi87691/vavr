@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,9 +151,9 @@ public interface CheckedFunction2<T1, T2, R> extends Lambda<R> {
      * @param t1 argument 1
      * @param t2 argument 2
      * @return the result of function application
-     * @throws Throwable if something goes wrong applying this function to the given arguments
+     * @throws Exception if something goes wrong applying this function to the given arguments
      */
-    R apply(T1 t1, T2 t2) throws Throwable;
+    R apply(T1 t1, T2 t2) throws Exception;
 
     /**
      * Applies this function partially to one argument.

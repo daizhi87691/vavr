@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -485,11 +485,27 @@ public final class LinkedHashSet<T> implements Set<T>, Serializable {
         return LinkedHashSet.ofAll(Iterator.rangeClosedBy(from, toInclusive, step));
     }
 
+    /**
+     * Add the given element to this set, replacing existing one if it is already contained.
+     * <p>
+     * Note that this method has a worst-case linear complexity.
+     *
+     * @param element The element to be added.
+     * @return A new set containing all elements of this set and also {@code element}.
+     */
     @Override
     public LinkedHashSet<T> add(T element) {
         return contains(element) ? this : new LinkedHashSet<>(map.put(element, element));
     }
 
+    /**
+     * Adds all of the given elements to this set, replacing existing one if they are not already contained.
+     * <p>
+     * Note that this method has a worst-case quadratic complexity.
+     *
+     * @param elements The elements to be added.
+     * @return A new set containing all elements of this set and the given {@code elements}, if not already contained.
+     */
     @Override
     public LinkedHashSet<T> addAll(Iterable<? extends T> elements) {
         Objects.requireNonNull(elements, "elements is null");
@@ -579,6 +595,12 @@ public final class LinkedHashSet<T> implements Set<T>, Serializable {
         Objects.requireNonNull(predicate, "predicate is null");
         final LinkedHashSet<T> filtered = LinkedHashSet.ofAll(iterator().filter(predicate));
         return filtered.length() == length() ? this : filtered;
+    }
+
+    @Override
+    public LinkedHashSet<T> reject(Predicate<? super T> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return filter(predicate.negate());
     }
 
     @Override
@@ -876,6 +898,16 @@ public final class LinkedHashSet<T> implements Set<T>, Serializable {
         return toJavaSet(java.util.LinkedHashSet::new);
     }
 
+    /**
+     * Adds all of the elements of {@code elements} to this set, replacing existing ones if they already present.
+     * <p>
+     * Note that this method has a worst-case quadratic complexity.
+     * <p>
+     * See also {@link #addAll(Iterable)}.
+     *
+     * @param elements The set to form the union with.
+     * @return A new set that contains all distinct elements of this and {@code elements} set.
+     */
     @SuppressWarnings("unchecked")
     @Override
     public LinkedHashSet<T> union(Set<? extends T> elements) {

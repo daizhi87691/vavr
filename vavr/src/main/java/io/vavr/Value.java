@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,6 @@ import static io.vavr.API.*;
  * <li>{@link #toEither(Object)}</li>
  * <li>{@link #toEither(Supplier)}</li>
  * <li>{@link #toInvalid(Object)}</li>
- * <li>{@link #toInvalid(Supplier)}</li>
  * <li>{@link #toJavaArray()}</li>
  * <li>{@link #toJavaArray(Class)}</li>
  * <li>{@link #toJavaCollection(Function)}</li>
@@ -163,8 +162,6 @@ import static io.vavr.API.*;
  * <li>{@link #toTry(Supplier)}</li>
  * <li>{@link #toValid(Object)}</li>
  * <li>{@link #toValid(Supplier)}</li>
- * <li>{@link #toValidation(Object)}</li>
- * <li>{@link #toValidation(Supplier)}</li>
  * <li>{@link #toVector()}</li>
  * </ul>
  *
@@ -1191,14 +1188,14 @@ public interface Value<T> extends Iterable<T> {
      * Converts this to an {@link Validation}.
      *
      * @param invalid An invalid value for the {@link Validation}
-     * @param <L>     Validation error component type
+     * @param <E>     Validation error component type
      * @return A new {@link Validation}.
      */
-    default <L> Validation<L, T> toValidation(L invalid) {
+    default <E> Validation<E, T> toValid(E invalid) {
         if (this instanceof Validation) {
-            return ((Validation<?, T>) this).mapError(ignored -> invalid);
+            return ((Validation<?, T>) this).mapErrors(ignored -> invalid);
         } else {
-            return isEmpty() ? Invalid(invalid) : Valid(get());
+            return isEmpty() ? Validation.invalid(invalid) : Validation.valid(get());
         }
     }
 
@@ -1206,15 +1203,15 @@ public interface Value<T> extends Iterable<T> {
      * Converts this to an {@link Validation}.
      *
      * @param invalidSupplier A {@link Supplier} for the invalid value for the {@link Validation}
-     * @param <L>             Validation error component type
+     * @param <E>             Validation error component type
      * @return A new {@link Validation}.
      */
-    default <L> Validation<L, T> toValidation(Supplier<? extends L> invalidSupplier) {
+    default <E> Validation<E, T> toValid(Supplier<? extends E> invalidSupplier) {
         Objects.requireNonNull(invalidSupplier, "invalidSupplier is null");
         if (this instanceof Validation) {
-            return ((Validation<?, T>) this).mapError(ignored -> invalidSupplier.get());
+            return ((Validation<?, T>) this).mapErrors(ignored -> invalidSupplier.get());
         } else {
-            return isEmpty() ? Invalid(invalidSupplier.get()) : Valid(get());
+            return isEmpty() ? Validation.invalid(invalidSupplier.get()) : Validation.valid(get());
         }
     }
 
@@ -1381,29 +1378,16 @@ public interface Value<T> extends Iterable<T> {
     }
 
     /**
-     * Converts this to a {@link Validation}.
+     * Converts this to a {@link Tree} using a {@code idMapper} and {@code parentMapper}.
      *
-     * @param <E>   error type of an {@code Invalid}
-     * @param error An error
-     * @return A new {@link Validation.Invalid} containing the given {@code error} if this is empty, otherwise
-     * a new {@link Validation.Valid} containing this value.
+     * @param <ID> Id type
+     * @param idMapper     A mapper from source item to unique identifier of that item
+     * @param parentMapper A mapper from source item to unique identifier of parent item. Need return null for root items
+     * @return A new {@link Tree}.
+     * @see Tree#build(Iterable, Function, Function)
      */
-    default <E> Validation<E, T> toValid(E error) {
-        return isEmpty() ? Validation.invalid(error) : Validation.valid(get());
-    }
-
-    /**
-     * Converts this to a {@link Validation}.
-     *
-     * @param <E>           error type of an {@code Invalid}
-     * @param errorSupplier A supplier of an error
-     * @return A new {@link Validation.Invalid} containing the result of {@code errorSupplier} if this is empty,
-     * otherwise a new {@link Validation.Valid} containing this value.
-     * @throws NullPointerException if {@code valueSupplier} is null
-     */
-    default <E> Validation<E, T> toValid(Supplier<? extends E> errorSupplier) {
-        Objects.requireNonNull(errorSupplier, "errorSupplier is null");
-        return isEmpty() ? Validation.invalid(errorSupplier.get()) : Validation.valid(get());
+    default <ID> List<Tree.Node<T>> toTree(Function<? super T, ? extends ID> idMapper, Function<? super T, ? extends ID> parentMapper) {
+        return Tree.build(this, idMapper, parentMapper);
     }
 
     /**

@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,9 @@ public final class CharSeq implements CharSequence, IndexedSeq<Character>, Seria
      */
     public static CharSeq ofAll(Iterable<? extends Character> elements) {
         Objects.requireNonNull(elements, "elements is null");
+        if (Collections.isEmpty(elements)){
+            return EMPTY;
+        }
         if (elements instanceof CharSeq) {
             return (CharSeq) elements;
         }
@@ -141,7 +144,7 @@ public final class CharSeq implements CharSequence, IndexedSeq<Character>, Seria
         for (char character : elements) {
             sb.append(character);
         }
-        return sb.length() == 0 ? EMPTY : of(sb);
+        return of(sb);
     }
 
     /**
@@ -528,6 +531,12 @@ public final class CharSeq implements CharSequence, IndexedSeq<Character>, Seria
     }
 
     @Override
+    public CharSeq reject(Predicate<? super Character> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return Collections.reject(this, predicate);
+    }
+
+    @Override
     public <U> IndexedSeq<U> flatMap(Function<? super Character, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper, "mapper is null");
         if (isEmpty()) {
@@ -772,12 +781,18 @@ public final class CharSeq implements CharSequence, IndexedSeq<Character>, Seria
     @Override
     public CharSeq prependAll(Iterable<? extends Character> elements) {
         Objects.requireNonNull(elements, "elements is null");
-        final StringBuilder sb = new StringBuilder();
-        for (char element : elements) {
-            sb.append(element);
+        if (Collections.isEmpty(elements)) {
+            return this;
+        } else if (isEmpty()) {
+            return ofAll(elements);
+        } else {
+            final StringBuilder sb = new StringBuilder();
+            for (char element : elements) {
+                sb.append(element);
+            }
+            sb.append(back);
+            return CharSeq.of(sb);
         }
-        sb.append(back);
-        return sb.length() == 0 ? EMPTY : of(sb);
     }
 
     @Override
@@ -848,8 +863,10 @@ public final class CharSeq implements CharSequence, IndexedSeq<Character>, Seria
     }
 
     @Override
+    @Deprecated
     public CharSeq removeAll(Predicate<? super Character> predicate) {
-        return io.vavr.collection.Collections.removeAll(this, predicate);
+        Objects.requireNonNull(predicate, "predicate is null");
+        return reject(predicate);
     }
 
     @Override
@@ -902,6 +919,16 @@ public final class CharSeq implements CharSequence, IndexedSeq<Character>, Seria
     @Override
     public CharSeq reverse() {
         return of(new StringBuilder(back).reverse().toString());
+    }
+
+    @Override
+    public CharSeq rotateLeft(int n) {
+        return Collections.rotateLeft(this, n);
+    }
+
+    @Override
+    public CharSeq rotateRight(int n) {
+        return Collections.rotateRight(this, n);
     }
 
     @Override

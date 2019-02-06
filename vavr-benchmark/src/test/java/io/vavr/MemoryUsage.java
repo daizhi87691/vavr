@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,8 @@ public class MemoryUsage {
             Tuple.of("^scalaz\\.Heap", "Scalaz persistent @ "),
             Tuple.of("^scala\\.collection.immutable", "Scala persistent @ "),
             Tuple.of("^scala\\.collection.mutable", "Scala mutable @ "),
-            Tuple.of("^io.vavr\\.", "Vavr persistent @ ")
+            Tuple.of("^io\\.usethesource", "Capsule persistent @ "),
+            Tuple.of("^io\\.vavr\\.", "Vavr persistent @ ")
     ).mapKeys(r -> Pattern.compile(r).asPredicate());
     private static String toHumanReadableName(Object target) {
         final Class<?> type = target.getClass();

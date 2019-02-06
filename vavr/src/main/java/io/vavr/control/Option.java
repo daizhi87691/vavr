@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -467,7 +467,7 @@ public interface Option<T> extends Value<T>, Serializable {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(value);
+            return HashCodes.hash(value);
         }
 
         @Override

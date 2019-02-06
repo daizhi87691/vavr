@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1085,6 +1085,16 @@ public final class Queue<T> extends AbstractQueue<T, Queue<T>> implements Linear
     @Override
     public Queue<T> reverse() {
         return isEmpty() ? this : ofAll(toList().reverse());
+    }
+
+    @Override
+    public Queue<T> rotateLeft(int n) {
+        return Collections.rotateLeft(this, n);
+    }
+
+    @Override
+    public Queue<T> rotateRight(int n) {
+        return Collections.rotateRight(this, n);
     }
 
     @Override

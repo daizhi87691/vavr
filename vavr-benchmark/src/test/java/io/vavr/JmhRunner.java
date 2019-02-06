@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ public class JmhRunner {
                 CharSeqBenchmark.class,
                 HashSetBenchmark.class,
                 ListBenchmark.class,
+                MapBenchmark.class,
                 PriorityQueueBenchmark.class,
                 VectorBenchmark.class,
 
@@ -71,6 +72,7 @@ public class JmhRunner {
         FUNCTIONAL_JAVA("fjava"),
         PCOLLECTIONS("pcollections"),
         ECOLLECTIONS("ecollections"),
+        CAPSULE("capsule"),
         CLOJURE("clojure"),
         SCALAZ("scalaz"),
         SCALA("scala"),
@@ -167,7 +169,7 @@ public class JmhRunner {
 
     private enum PrintInlining {
         ENABLE,
-        DISABLE;
+        DISABLE
     }
 
     /* Helper methods */

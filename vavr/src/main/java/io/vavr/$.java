@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 package io.vavr;
 
+import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import io.vavr.control.Validation;
@@ -93,6 +94,6 @@ class $ {
     @Unapply
     static <E, T> Tuple1<T> Valid(Validation.Valid<E, T> valid) { return Tuple.of(valid.get()); }
     @Unapply
-    static <E, T> Tuple1<E> Invalid(Validation.Invalid<E, T> invalid) { return Tuple.of(invalid.getError()); }
+    static <E, T> Tuple1<Seq<E>> Invalid(Validation.Invalid<E, T> invalid) { return Tuple.of(invalid.getErrors()); }
 
 }

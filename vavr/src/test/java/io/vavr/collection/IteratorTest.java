@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -398,6 +398,45 @@ public class IteratorTest extends AbstractTraversableTest {
         }).head()).isEqualTo(2);
     }
 
+    // -- static iterate(Supplier<Option>)
+
+    static class OptionSupplier implements Supplier<Option<Integer>> {
+
+        int cnt;
+        final int end;
+
+        OptionSupplier(int start) {
+            this(start, Integer.MAX_VALUE);
+        }
+
+        OptionSupplier(int start, int end) {
+            this.cnt = start;
+            this.end = end;
+        }
+
+        @Override
+        public Option<Integer> get() {
+            Option<Integer> res;
+            if (cnt < end) {
+                res = Option.some(cnt);
+            } else {
+                res = Option.none();
+            }
+            cnt++;
+            return res;
+        }
+    }
+
+    @Test
+    public void shouldGenerateInfiniteStreamBasedOnOptionSupplier() {
+        assertThat(Iterator.iterate(new OptionSupplier(1)).take(5).reduce((i, j) -> i + j)).isEqualTo(15);
+    }
+
+    @Test
+    public void shouldGenerateFiniteStreamBasedOnOptionSupplier() {
+        assertThat(Iterator.iterate(new OptionSupplier(1, 4)).take(50000).reduce((i, j) -> i + j)).isEqualTo(6);
+    }
+
     // -- groupBy
 
     @Override
@@ -486,6 +525,7 @@ public class IteratorTest extends AbstractTraversableTest {
         multipleHasNext(() -> Iterator.from(1L), 5);
         multipleHasNext(() -> Iterator.from(1L, 2L), 5);
         multipleHasNext(() -> Iterator.iterate(1, i -> i + 1), 5);
+        multipleHasNext(() -> Iterator.iterate(new OptionSupplier(1)), 5);
         multipleHasNext(() -> Iterator.tabulate(10, i -> i + 1));
         multipleHasNext(() -> Iterator.unfold(10, x -> x == 0 ? Option.none() : Option.of(new Tuple2<>(x - 1, x))));
         multipleHasNext(() -> Iterator.unfoldLeft(10, x -> x == 0 ? Option.none() : Option.of(new Tuple2<>(x - 1, x))));
@@ -515,6 +555,7 @@ public class IteratorTest extends AbstractTraversableTest {
         multipleHasNext(() -> Iterator.of(1, 2, 3, 4).dropUntil(e -> e == 3));
         multipleHasNext(() -> Iterator.of(1, 2, 3, 4).dropWhile(e -> e == 1));
         multipleHasNext(() -> Iterator.of(1, 2, 3, 4).filter(e -> e > 1));
+        multipleHasNext(() -> Iterator.of(1, 2, 3, 4).reject(e -> e <= 1));
         multipleHasNext(() -> Iterator.of(1, 2, 3, 4).flatMap(e -> Iterator.of(e, e + 1)));
         multipleHasNext(() -> Iterator.of(1, 2, 3, 4).grouped(2));
         multipleHasNext(() -> Iterator.of(1, 2, 3, 4).intersperse(-1));

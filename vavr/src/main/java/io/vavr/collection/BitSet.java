@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -387,6 +387,9 @@ public interface BitSet<T> extends SortedSet<T> {
 
     @Override
     BitSet<T> filter(Predicate<? super T> predicate);
+
+    @Override
+    BitSet<T> reject(Predicate<? super T> predicate);
 
     @Override
     default <U> SortedSet<U> flatMap(Comparator<? super U> comparator, Function<? super T, ? extends Iterable<? extends U>> mapper) {
@@ -820,6 +823,13 @@ interface BitSetModule {
         public BitSet<T> filter(Predicate<? super T> predicate) {
             Objects.requireNonNull(predicate, "predicate is null");
             final BitSet<T> bitSet = createFromAll(iterator().filter(predicate));
+            return (bitSet.length() == length()) ? this : bitSet;
+        }
+
+        @Override
+        public BitSet<T> reject(Predicate<? super T> predicate) {
+            Objects.requireNonNull(predicate, "predicate is null");
+            final BitSet<T> bitSet = createFromAll(iterator().reject(predicate));
             return (bitSet.length() == length()) ? this : bitSet;
         }
 

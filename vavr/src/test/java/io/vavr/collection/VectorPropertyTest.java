@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -232,9 +231,7 @@ public class VectorPropertyTest {
 
     @Test
     public void shouldBehaveLikeArray() {
-        final int seed = ThreadLocalRandom.current().nextInt();
-        System.out.println("using seed " + seed);
-        final Random random = new Random(seed);
+        final Random random = new Random(13579);
 
         for (int i = 1; i < 10; i++) {
             Seq<Object> expected = Array.empty();

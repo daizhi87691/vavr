@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ public interface CheckedConsumer<T> {
      * Performs side-effects.
      *
      * @param t a value of type {@code T}
-     * @throws Throwable if an error occurs
+     * @throws Exception if an error occurs
      */
-    void accept(T t) throws Throwable;
+    void accept(T t) throws Exception;
 
     /**
      * Returns a chained {@code CheckedConsumer} that first executes {@code this.accept(t)}

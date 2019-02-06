@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -494,11 +494,10 @@ public final class HashSet<T> implements Set<T>, Serializable {
             final HashSet<T> set = (HashSet<T>) elements;
             return set;
         }
-        final HashArrayMappedTrie<T, T> that = addAll(tree, elements);
-        if (that.size() == tree.size()) {
+        if (Collections.isEmpty(elements) || this.equals(elements)){
             return this;
         } else {
-            return new HashSet<>(that);
+            return new HashSet<>(addAll(tree, elements));
         }
     }
 
@@ -578,6 +577,12 @@ public final class HashSet<T> implements Set<T>, Serializable {
         } else {
             return filtered;
         }
+    }
+
+    @Override
+    public HashSet<T> reject(Predicate<? super T> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return filter(predicate.negate());
     }
 
     @Override

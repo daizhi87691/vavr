@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ public class Tuple1Test {
     @Test
     public void shouldComputeCorrectHashCode() {
         final int actual = createTuple().hashCode();
-        final int expected = Objects.hash(new Object[] { null });
+        final int expected = Objects.hashCode(null);
         assertThat(actual).isEqualTo(expected);
     }
 

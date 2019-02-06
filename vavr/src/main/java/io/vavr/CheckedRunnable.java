@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public interface CheckedRunnable {
     /**
      * Performs side-effects.
      *
-     * @throws Throwable if an error occurs
+     * @throws Exception if an error occurs
      */
-    void run() throws Throwable;
+    void run() throws Exception;
 }

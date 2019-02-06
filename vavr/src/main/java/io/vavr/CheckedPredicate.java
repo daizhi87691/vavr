@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ public interface CheckedPredicate<T> {
      *
      * @param t the input argument
      * @return {@code true} if the input argument matches the predicate, otherwise {@code false}
-     * @throws Throwable if an error occurs
+     * @throws Exception if an error occurs
      */
-    boolean test(T t) throws Throwable;
+    boolean test(T t) throws Exception;
 
     /**
      * Negates this predicate.

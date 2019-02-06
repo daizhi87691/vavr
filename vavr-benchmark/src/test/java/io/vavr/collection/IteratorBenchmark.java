@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class IteratorBenchmark {
 
     @State(Scope.Benchmark)
     public static class Base {
-        @Param({ "10", "100", "1000" })
+        @Param({"10", "100", "1000", "2500"})
         public int CONTAINER_SIZE;
 
         Integer[] ELEMENTS;

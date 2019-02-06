@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,10 +68,17 @@ final class Concurrent {
         };
     }
 
-    static <T, X extends Throwable> CheckedFunction0<T> zZz(X exception) {
+    static <T, X extends Exception> CheckedFunction0<T> zZz(X exception) {
         return () -> {
             zZz();
             throw exception;
+        };
+    }
+
+    static <T, X extends Error> CheckedFunction0<T> zZz(X error) {
+        return () -> {
+            zZz();
+            throw error;
         };
     }
 }

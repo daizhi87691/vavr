@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,11 @@ public final class IntMap<T> implements Traversable<T>, Serializable {
     @Override
     public IntMap<T> filter(Predicate<? super T> predicate) {
         return unit(original.filter(p -> predicate.test(p._2)));
+    }
+
+    @Override
+    public IntMap<T> reject(Predicate<? super T> predicate) {
+        return unit(original.reject(p -> predicate.test(p._2)));
     }
 
     @Override

@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -589,8 +589,18 @@ public final class LinkedHashMap<K, V> implements Map<K, V>, Serializable {
     }
 
     @Override
+    public LinkedHashMap<K, V> reject(BiPredicate<? super K, ? super V> predicate) {
+        return Maps.reject(this, this::createFromEntries, predicate);
+    }
+
+    @Override
     public LinkedHashMap<K, V> filter(Predicate<? super Tuple2<K, V>> predicate) {
         return Maps.filter(this, this::createFromEntries, predicate);
+    }
+
+    @Override
+    public LinkedHashMap<K, V> reject(Predicate<? super Tuple2<K, V>> predicate) {
+        return Maps.reject(this, this::createFromEntries, predicate);
     }
 
     @Override
@@ -599,8 +609,18 @@ public final class LinkedHashMap<K, V> implements Map<K, V>, Serializable {
     }
 
     @Override
+    public LinkedHashMap<K, V> rejectKeys(Predicate<? super K> predicate) {
+        return Maps.rejectKeys(this, this::createFromEntries, predicate);
+    }
+
+    @Override
     public LinkedHashMap<K, V> filterValues(Predicate<? super V> predicate) {
         return Maps.filterValues(this, this::createFromEntries, predicate);
+    }
+
+    @Override
+    public LinkedHashMap<K, V> rejectValues(Predicate<? super V> predicate) {
+        return Maps.rejectValues(this, this::createFromEntries, predicate);
     }
 
     @Override
@@ -758,6 +778,17 @@ public final class LinkedHashMap<K, V> implements Map<K, V>, Serializable {
         return Maps.put(this, key, value, merge);
     }
 
+    /**
+     * Associates the specified value with the specified key in this map.
+     * If the map previously contained a mapping for the key, the old value is
+     * replaced by the specified value.
+     * <p>
+     * Note that this method has a worst-case linear complexity.
+     *
+     * @param key   key with which the specified value is to be associated
+     * @param value value to be associated with the specified key
+     * @return A new Map containing these elements and that entry.
+     */
     @Override
     public LinkedHashMap<K, V> put(K key, V value) {
         final Queue<Tuple2<K, V>> newList;
@@ -794,8 +825,10 @@ public final class LinkedHashMap<K, V> implements Map<K, V>, Serializable {
     }
 
     @Override
+    @Deprecated
     public LinkedHashMap<K, V> removeAll(BiPredicate<? super K, ? super V> predicate) {
-        return Maps.removeAll(this, this::createFromEntries, predicate);
+        Objects.requireNonNull(predicate, "predicate is null");
+        return reject(predicate);
     }
 
     @Override
@@ -808,13 +841,17 @@ public final class LinkedHashMap<K, V> implements Map<K, V>, Serializable {
     }
 
     @Override
+    @Deprecated
     public LinkedHashMap<K, V> removeKeys(Predicate<? super K> predicate) {
-        return Maps.removeKeys(this, this::createFromEntries, predicate);
+        Objects.requireNonNull(predicate, "predicate is null");
+        return rejectKeys(predicate);
     }
 
     @Override
+    @Deprecated
     public LinkedHashMap<K, V> removeValues(Predicate<? super V> predicate) {
-        return Maps.removeValues(this, this::createFromEntries, predicate);
+        Objects.requireNonNull(predicate, "predicate is null");
+        return rejectValues(predicate);
     }
 
     @Override

@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -232,6 +232,22 @@ public interface Stream<T> extends LinearSeq<T> {
     static <T> Stream<T> iterate(T seed, Function<? super T, ? extends T> f) {
         Objects.requireNonNull(f, "f is null");
         return Stream.ofAll(Iterator.iterate(seed, f));
+    }
+
+    /**
+     * Generates a (theoretically) infinitely long Stream using a repeatedly invoked supplier
+     * that provides a {@code Some} for each next value and a {@code None} for the end.
+     * The {@code Supplier} will be invoked only that many times until it returns {@code None},
+     * and repeated iteration over the stream will produce the same values in the same order,
+     * without any further invocations to the {@code Supplier}.
+     *
+     * @param supplier A Supplier of iterator values
+     * @param <T> value type
+     * @return A new Stream
+     */
+    static <T> Stream<T> iterate(Supplier<? extends Option<? extends T>> supplier) {
+        Objects.requireNonNull(supplier, "supplier is null");
+        return Stream.ofAll(Iterator.iterate(supplier));
     }
 
     /**
@@ -1025,6 +1041,12 @@ public interface Stream<T> extends LinearSeq<T> {
     }
 
     @Override
+    default Stream<T> reject(Predicate<? super T> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return Collections.reject(this, predicate);
+    }
+
+    @Override
     default <U> Stream<U> flatMap(Function<? super T, ? extends Iterable<? extends U>> mapper) {
         Objects.requireNonNull(mapper, "mapper is null");
         return isEmpty() ? Empty.instance() : Stream.ofAll(new Iterator<U>() {
@@ -1354,8 +1376,10 @@ public interface Stream<T> extends LinearSeq<T> {
     }
 
     @Override
+    @Deprecated
     default Stream<T> removeAll(Predicate<? super T> predicate) {
-        return io.vavr.collection.Collections.removeAll(this, predicate);
+        Objects.requireNonNull(predicate, "predicate is null");
+        return reject(predicate);
     }
 
     @Override
@@ -1391,6 +1415,16 @@ public interface Stream<T> extends LinearSeq<T> {
     @Override
     default Stream<T> reverse() {
         return isEmpty() ? this : foldLeft(Stream.empty(), Stream::prepend);
+    }
+
+    @Override
+    default Stream<T> rotateLeft(int n) {
+        return Collections.rotateLeft(this, n);
+    }
+
+    @Override
+    default Stream<T> rotateRight(int n) {
+        return Collections.rotateRight(this, n);
     }
 
     @Override

@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,19 +245,25 @@ final class Maps {
         }
     }
 
-    static <K, V, M extends Map<K, V>> M removeAll(M map, OfEntries<K, V, M> ofEntries,
+    static <K, V, M extends Map<K, V>> M reject(M map, OfEntries<K, V, M> ofEntries,
+            Predicate<? super Tuple2<K, V>> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return filter(map, ofEntries, predicate.negate());
+    }
+
+    static <K, V, M extends Map<K, V>> M reject(M map, OfEntries<K, V, M> ofEntries,
             BiPredicate<? super K, ? super V> predicate) {
         Objects.requireNonNull(predicate, "predicate is null");
         return filter(map, ofEntries, predicate.negate());
     }
 
-    static <K, V, M extends Map<K, V>> M removeKeys(M map, OfEntries<K, V, M> ofEntries,
+    static <K, V, M extends Map<K, V>> M rejectKeys(M map, OfEntries<K, V, M> ofEntries,
             Predicate<? super K> predicate) {
         Objects.requireNonNull(predicate, "predicate is null");
         return filterKeys(map, ofEntries, predicate.negate());
     }
 
-    static <K, V, M extends Map<K, V>> M removeValues(M map, OfEntries<K, V, M> ofEntries,
+    static <K, V, M extends Map<K, V>> M rejectValues(M map, OfEntries<K, V, M> ofEntries,
             Predicate<? super V> predicate) {
         Objects.requireNonNull(predicate, "predicate is null");
         return filterValues(map, ofEntries, predicate.negate());

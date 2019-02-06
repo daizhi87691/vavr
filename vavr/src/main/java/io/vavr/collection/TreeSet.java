@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -532,17 +532,16 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
     @Override
     public TreeSet<T> addAll(Iterable<? extends T> elements) {
         Objects.requireNonNull(elements, "elements is null");
+        if (Collections.isEmpty(elements) || this.equals(elements)){
+            return this;
+        }
         RedBlackTree<T> that = tree;
         for (T element : elements) {
             if (!that.contains(element)) {
                 that = that.insert(element);
             }
         }
-        if (tree == that) {
-            return this;
-        } else {
-            return new TreeSet<>(that);
-        }
+        return new TreeSet<>(that);
     }
 
     @Override
@@ -631,6 +630,12 @@ public final class TreeSet<T> implements SortedSet<T>, Serializable {
         Objects.requireNonNull(predicate, "predicate is null");
         final TreeSet<T> treeSet = TreeSet.ofAll(tree.comparator(), iterator().filter(predicate));
         return (treeSet.length() == length()) ? this : treeSet;
+    }
+
+    @Override
+    public TreeSet<T> reject(Predicate<? super T> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return filter(predicate.negate());
     }
 
     @Override

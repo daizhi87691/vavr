@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,6 +215,9 @@ public interface Set<T> extends Traversable<T>, Function1<T, Boolean>, Serializa
 
     @Override
     Set<T> filter(Predicate<? super T> predicate);
+
+    @Override
+    Set<T> reject(Predicate<? super T> predicate);
 
     @Override
     <U> Set<U> flatMap(Function<? super T, ? extends Iterable<? extends U>> mapper);

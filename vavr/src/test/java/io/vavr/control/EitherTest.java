@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -392,7 +392,7 @@ public class EitherTest extends AbstractValueTest {
     public void shouldConvertToInvalidValidation() {
         final Validation<String, ?> validation = Either.left("vavr").toValidation();
         assertThat(validation.isInvalid()).isTrue();
-        assertThat(validation.getError()).isEqualTo("vavr");
+        assertThat(validation.getErrors()).isEqualTo(List.of("vavr"));
     }
 
     // hashCode

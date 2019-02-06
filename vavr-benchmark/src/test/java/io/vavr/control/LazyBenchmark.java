@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,24 +79,30 @@ public class LazyBenchmark {
 
         @Benchmark
         public void java_eager(Blackhole bh) {
-            for (int i = 0; i < SIZE; i++) {
-                bh.consume(EAGERS[i]);
+            int size = SIZE;
+            Integer[] eagers = EAGERS;
+            for (int i = 0; i < size; i++) {
+                bh.consume(eagers[i]);
             }
         }
 
         @Benchmark
         public void vavr_inited_lazy(Blackhole bh) {
-            for (int i = 0; i < SIZE; i++) {
-                assert INITED_LAZIES[i].isEvaluated();
-                bh.consume(INITED_LAZIES[i].get());
+            int size = SIZE;
+            Lazy<Integer>[] initedLazies = INITED_LAZIES;
+            for (int i = 0; i < size; i++) {
+                assert initedLazies[i].isEvaluated();
+                bh.consume(initedLazies[i].get());
             }
         }
 
         @Benchmark
         public void vavr_lazy(Initialized state, Blackhole bh) {
-            for (int i = 0; i < SIZE; i++) {
-                assert !state.LAZIES[i].isEvaluated();
-                bh.consume(state.LAZIES[i].get());
+            int size = SIZE;
+            Lazy<Integer>[] lazies = state.LAZIES;
+            for (int i = 0; i < size; i++) {
+                assert !lazies[i].isEvaluated();
+                bh.consume(lazies[i].get());
             }
         }
     }

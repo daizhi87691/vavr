@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -974,6 +974,37 @@ public interface Iterator<T> extends java.util.Iterator<T>, Traversable<T> {
     }
 
     /**
+     * Creates an iterator that repeatedly invokes the supplier
+     * while it's a {@code Some} and end on the first {@code None}
+     *
+     * @param supplier A Supplier of iterator values
+     * @param <T> value type
+     * @return A new {@code Iterator}
+     * @throws NullPointerException if supplier produces null value
+     */
+    static <T> Iterator<T> iterate(Supplier<? extends Option<? extends T>> supplier) {
+        Objects.requireNonNull(supplier, "supplier is null");
+        return new AbstractIterator<T>() {
+            Option<? extends T> nextOption;
+
+            @Override
+            public boolean hasNext() {
+                if (nextOption == null) {
+                    nextOption = supplier.get();
+                }
+                return nextOption.isDefined();
+            }
+
+            @Override
+            public T getNext() {
+                final T next =  nextOption.get();
+                nextOption = null;
+                return next;
+            }
+        };
+    }
+
+    /**
      * Generates an infinite iterator using a function to calculate the next value
      * based on the previous.
      *
@@ -1451,6 +1482,12 @@ public interface Iterator<T> extends java.util.Iterator<T>, Traversable<T> {
                 }
             };
         }
+    }
+
+    @Override
+    default Iterator<T> reject(Predicate<? super T> predicate) {
+        Objects.requireNonNull(predicate, "predicate is null");
+        return filter(predicate.negate());
     }
 
     @Override

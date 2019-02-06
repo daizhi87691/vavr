@@ -3,7 +3,7 @@
  *  \  \/  /  /\  \  \/  /  /
  *   \____/__/  \__\____/__/
  *
- * Copyright 2014-2017 Vavr, http://vavr.io
+ * Copyright 2014-2018 Vavr, http://vavr.io
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -312,22 +312,6 @@ interface RedBlackTree<T> extends Iterable<T> {
     }
 
     /**
-     * Compares color, value and sub-trees. The comparator is not compared because function equality is not computable.
-     *
-     * @return The hash code of this tree.
-     */
-    @Override
-    boolean equals(Object o);
-
-    /**
-     * Computes the hash code of this tree based on color, value and sub-trees. The comparator is not taken into account.
-     *
-     * @return The hash code of this tree.
-     */
-    @Override
-    int hashCode();
-
-    /**
      * Returns a Lisp like representation of this tree.
      *
      * @return This Tree as Lisp like String.
@@ -438,25 +422,6 @@ interface RedBlackTreeModule {
         @Override
         public T value() {
             return value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            } else if (o instanceof Node) {
-                final Node<?> that = (Node<?>) o;
-                return Collections.areEqual(this, that);
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            // DEV-NOTE: Using `Objects.hash(this.value, this.left, this.right)` would leak the tree structure to the outside.
-            //           We just want to hash the values in the right order.
-            return Collections.hashOrdered(this);
         }
 
         @Override
@@ -618,24 +583,19 @@ interface RedBlackTreeModule {
         }
 
         private static <T> Tuple3<? extends RedBlackTree<T>, Boolean, T> deleteMin(Node<T> node) {
-            if (node.left.isEmpty()) {
-                if (node.color == BLACK) {
-                    if (node.right.isEmpty()) {
-                        return Tuple.of(node.empty, true, node.value);
-                    } else {
-                        final Node<T> rightNode = (Node<T>) node.right;
-                        return Tuple.of(rightNode.color(BLACK), false, node.value);
-                    }
-                } else {
-                    return Tuple.of(node.right, false, node.value);
-                }
-            } else {
+            if (node.color() == BLACK && node.left().isEmpty() && node.right.isEmpty()){
+                return Tuple.of(node.empty, true, node.value());
+            } else if (node.color() == BLACK && node.left().isEmpty() && node.right().color() == RED){
+                return Tuple.of(((Node<T>)node.right()).color(BLACK), false, node.value());
+            } else if (node.color() == RED && node.left().isEmpty()){
+                return Tuple.of(node.right(), false, node.value());
+            } else{
                 final Node<T> nodeLeft = (Node<T>) node.left;
                 final Tuple3<? extends RedBlackTree<T>, Boolean, T> newNode = deleteMin(nodeLeft);
                 final RedBlackTree<T> l = newNode._1;
-                final boolean d = newNode._2;
+                final boolean deleted = newNode._2;
                 final T m = newNode._3;
-                if (d) {
+                if (deleted) {
                     final Tuple2<Node<T>, Boolean> tD = Node.unbalancedRight(node.color, node.blackHeight - 1, l,
                             node.value, node.right, node.empty);
                     return Tuple.of(tD._1, tD._2, m);
@@ -744,7 +704,7 @@ interface RedBlackTreeModule {
                 return new Node<>(RED, n1.blackHeight + 1, n1, m, t2, n1.empty);
             } else if (isRed(n1.left)) {
                 final Node<T> node = new Node<>(BLACK, n1.blackHeight, n1.right, m, t2, n1.empty);
-                return new Node<>(RED, n1.blackHeight, Node.color(n1.left, BLACK), n1.value, node, n1.empty);
+                return new Node<>(RED, n1.blackHeight + 1, Node.color(n1.left, BLACK), n1.value, node, n1.empty);
             } else if (isRed(n1.right)) {
                 final RedBlackTree<T> rl = ((Node<T>) n1.right).left;
                 final T rx = ((Node<T>) n1.right).value;
@@ -917,17 +877,6 @@ interface RedBlackTreeModule {
         @Override
         public T value() {
             throw new NoSuchElementException("value on empty");
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            // note: it is not possible to compare the comparators because function equality is not computable
-            return (o == this) || (o instanceof Empty);
-        }
-
-        @Override
-        public int hashCode() {
-            return 1;
         }
 
         @Override
